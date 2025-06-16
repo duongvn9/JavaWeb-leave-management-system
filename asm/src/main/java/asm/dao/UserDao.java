@@ -79,6 +79,16 @@ public class UserDao {
         } catch (Exception e) {e.printStackTrace();}
         return roles;
     }
+    public Integer findDeptIdByUserId(int userId) {
+        String sql = "SELECT dept_id FROM users WHERE id = ?";
+        try (Connection con = DBCP.getDataSource().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt("dept_id");
+        } catch (Exception e) {e.printStackTrace();}
+        return null;
+    }
 
     private int getRoleId(Connection con, String code) {
         try (PreparedStatement ps = con.prepareStatement("SELECT id FROM roles WHERE code=?")) {
