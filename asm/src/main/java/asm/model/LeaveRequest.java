@@ -7,16 +7,18 @@ import java.time.LocalDateTime;
 public class LeaveRequest implements Serializable {
     private int id;
     private int employeeId;
+    private String employeeName; // thêm trường tên nhân viên
     private LocalDate fromDate;
     private LocalDate toDate;
     private String reason;
-    private String status; // INPROGRESS / APPROVED / REJECTED
+    private String status; // INPROGRESS / APPROVED / REJECTED / CANCELLED
     private boolean edited;
     private LocalDateTime createdAt;
 
-    public LeaveRequest(int id, int employeeId, LocalDate fromDate, LocalDate toDate, String reason, String status, boolean edited, LocalDateTime createdAt) {
+    public LeaveRequest(int id, int employeeId, String employeeName, LocalDate fromDate, LocalDate toDate, String reason, String status, boolean edited, LocalDateTime createdAt) {
         this.id = id;
         this.employeeId = employeeId;
+        this.employeeName = employeeName;
         this.fromDate = fromDate;
         this.toDate = toDate;
         this.reason = reason;
@@ -27,6 +29,7 @@ public class LeaveRequest implements Serializable {
 
     public int getId() {return id;}
     public int getEmployeeId() {return employeeId;}
+    public String getEmployeeName() {return employeeName;}
     public LocalDate getFromDate() {return fromDate;}
     public LocalDate getToDate() {return toDate;}
     public String getReason() {return reason;}
