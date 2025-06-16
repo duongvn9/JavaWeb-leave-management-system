@@ -13,10 +13,11 @@
     <title>Đơn nghỉ phép của tôi</title>
 </head>
 <body>
-<h2>Danh sách đơn nghỉ phép</h2>
+<h2>Danh sách đơn nghỉ phép của tôi</h2>
 <table border="1" cellpadding="6" cellspacing="0">
     <tr>
         <th>ID</th>
+        <th>Nhân viên</th>
         <th>Từ ngày</th>
         <th>Đến ngày</th>
         <th>Lý do</th>
@@ -28,6 +29,7 @@
     <c:forEach var="r" items="${requests}">
         <tr>
             <td>${r.id}</td>
+            <td>${r.employeeName} (ID: ${r.employeeId})</td>
             <td>${r.fromDate}</td>
             <td>${r.toDate}</td>
             <td>${r.reason}</td>
