@@ -29,7 +29,7 @@ public class LeaveRequestDao {
 
     public List<LeaveRequest> listByEmployee(int employeeId) {
         List<LeaveRequest> list = new ArrayList<>();
-        String sql = "SELECT * FROM leave_requests WHERE employee_id=? ORDER BY created_at DESC";
+        String sql = "SELECT lr.*, u.full_name as emp_name FROM leave_requests lr JOIN users u ON lr.employee_id = u.id WHERE lr.employee_id=? ORDER BY lr.created_at DESC";
         try (Connection con = DBCP.getDataSource().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, employeeId);
@@ -41,8 +41,22 @@ public class LeaveRequestDao {
         return list;
     }
 
+    public List<LeaveRequest> listByDepartment(Integer deptId, boolean isAdmin) {
+        List<LeaveRequest> list = new ArrayList<>();
+        String sql = isAdmin
+            ? "SELECT lr.*, u.full_name as emp_name FROM leave_requests lr JOIN users u ON lr.employee_id=u.id ORDER BY lr.created_at DESC"
+            : "SELECT lr.*, u.full_name as emp_name FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE u.dept_id=? ORDER BY lr.created_at DESC";
+        try (Connection con = DBCP.getDataSource().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            if (!isAdmin) ps.setInt(1, deptId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(map(rs));
+        } catch (Exception e) {e.printStackTrace();}
+        return list;
+    }
+
     public LeaveRequest findById(int id) {
-        String sql = "SELECT * FROM leave_requests WHERE id = ?";
+        String sql = "SELECT lr.*, u.full_name as emp_name FROM leave_requests lr JOIN users u ON lr.employee_id = u.id WHERE lr.id = ?";
         try (Connection con = DBCP.getDataSource().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -80,6 +94,7 @@ public class LeaveRequestDao {
         return new LeaveRequest(
                 rs.getInt("id"),
                 rs.getInt("employee_id"),
+                rs.getString("emp_name"),
                 rs.getDate("from_date").toLocalDate(),
                 rs.getDate("to_date").toLocalDate(),
                 rs.getString("reason"),

@@ -28,4 +28,11 @@ public class LeaveRequestService {
     public void cancel(int id) {
         dao.cancel(id);
     }
+    
+    /**
+     * Trả về tất cả đơn nghỉ phép của phòng ban (leader), hoặc toàn hệ thống (admin)
+     */
+    public List<LeaveRequest> listByDepartment(Integer deptId, boolean isAdmin) {
+        return dao.listByDepartment(deptId, isAdmin);
+    }
 }
