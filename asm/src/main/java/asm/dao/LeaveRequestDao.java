@@ -10,75 +10,81 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LeaveRequestDao {
+
+    /* ------------------- CRUD ------------------- */
     public int create(int employeeId, LocalDate from, LocalDate to, String reason) {
         String sql = "INSERT INTO leave_requests(employee_id, from_date, to_date, reason, status) VALUES (?,?,?,?, 'INPROGRESS');";
         try (Connection con = DBCP.getDataSource().getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, employeeId);
-            ps.setDate(2, java.sql.Date.valueOf(from));
-            ps.setDate(3, java.sql.Date.valueOf(to));
+            ps.setDate(2, Date.valueOf(from));
+            ps.setDate(3, Date.valueOf(to));
             ps.setString(4, reason);
             ps.executeUpdate();
             ResultSet keys = ps.getGeneratedKeys();
-            if (keys.next()) {
-                return keys.getInt(1);
-            }
-        } catch (Exception e) {e.printStackTrace();}
+            if (keys.next()) return keys.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
         return -1;
     }
 
-    public List<LeaveRequest> listByEmployee(int employeeId) {
-        List<LeaveRequest> list = new ArrayList<>();
-        String sql = "SELECT lr.*, u.full_name as emp_name FROM leave_requests lr JOIN users u ON lr.employee_id = u.id WHERE lr.employee_id=? ORDER BY lr.created_at DESC";
+    public LeaveRequest findById(int id) {
+        String sql = "SELECT lr.*, u.full_name emp_name, u.dept_id FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE lr.id=?";
         try (Connection con = DBCP.getDataSource().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, employeeId);
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(map(rs));
-            }
-        } catch (Exception e) {e.printStackTrace();}
+            if (rs.next()) return map(rs);
+        } catch (Exception e) { e.printStackTrace(); }
+        return null;
+    }
+
+    public List<LeaveRequest> listByEmployee(int empId) {
+        List<LeaveRequest> list = new ArrayList<>();
+        String sql = "SELECT lr.*, u.full_name emp_name, u.dept_id FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE lr.employee_id=? ORDER BY lr.created_at DESC";
+        try (Connection con = DBCP.getDataSource().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, empId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(map(rs));
+        } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
 
     public List<LeaveRequest> listByDepartment(Integer deptId, boolean isAdmin) {
         List<LeaveRequest> list = new ArrayList<>();
-        String sql = isAdmin
-            ? "SELECT lr.*, u.full_name as emp_name FROM leave_requests lr JOIN users u ON lr.employee_id=u.id ORDER BY lr.created_at DESC"
-            : "SELECT lr.*, u.full_name as emp_name FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE u.dept_id=? ORDER BY lr.created_at DESC";
+        String sql = isAdmin ?
+                "SELECT lr.*, u.full_name emp_name, u.dept_id FROM leave_requests lr JOIN users u ON lr.employee_id=u.id ORDER BY lr.created_at DESC" :
+                "SELECT lr.*, u.full_name emp_name, u.dept_id FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE u.dept_id=? ORDER BY lr.created_at DESC";
         try (Connection con = DBCP.getDataSource().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             if (!isAdmin) ps.setInt(1, deptId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) list.add(map(rs));
-        } catch (Exception e) {e.printStackTrace();}
+        } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
 
-    public LeaveRequest findById(int id) {
-        String sql = "SELECT lr.*, u.full_name as emp_name FROM leave_requests lr JOIN users u ON lr.employee_id = u.id WHERE lr.id = ?";
+    public void updateStatus(int id, String status) {
+        String sql = "UPDATE leave_requests SET status=?, updated_at=GETDATE() WHERE id=?";
         try (Connection con = DBCP.getDataSource().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return map(rs);
-            }
-        } catch (Exception e) {e.printStackTrace();}
-        return null;
+            ps.setString(1, status);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void update(int id, LocalDate from, LocalDate to, String reason, boolean isEdited) {
+    public void update(int id, LocalDate from, LocalDate to, String reason, boolean edited) {
         String sql = "UPDATE leave_requests SET from_date=?, to_date=?, reason=?, is_edited=?, updated_at=GETDATE() WHERE id=? AND status='INPROGRESS'";
         try (Connection con = DBCP.getDataSource().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setDate(1, java.sql.Date.valueOf(from));
-            ps.setDate(2, java.sql.Date.valueOf(to));
+            ps.setDate(1, Date.valueOf(from));
+            ps.setDate(2, Date.valueOf(to));
             ps.setString(3, reason);
-            ps.setBoolean(4, isEdited);
+            ps.setBoolean(4, edited);
             ps.setInt(5, id);
             ps.executeUpdate();
-        } catch (Exception e) {e.printStackTrace();}
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
     public void cancel(int id) {
@@ -87,20 +93,21 @@ public class LeaveRequestDao {
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
-        } catch (Exception e) {e.printStackTrace();}
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
+    /* ------------------- Helper ------------------- */
     private LeaveRequest map(ResultSet rs) throws Exception {
         return new LeaveRequest(
                 rs.getInt("id"),
                 rs.getInt("employee_id"),
                 rs.getString("emp_name"),
+                rs.getObject("dept_id", Integer.class),
                 rs.getDate("from_date").toLocalDate(),
                 rs.getDate("to_date").toLocalDate(),
                 rs.getString("reason"),
                 rs.getString("status"),
                 rs.getBoolean("is_edited"),
-                rs.getTimestamp("created_at").toLocalDateTime()
-        );
+                rs.getTimestamp("created_at").toLocalDateTime());
     }
 }

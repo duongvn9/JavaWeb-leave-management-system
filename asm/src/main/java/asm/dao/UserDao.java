@@ -1,101 +1,134 @@
 package asm.dao;
 
+import asm.model.Department;
+import asm.model.RoleOption;
 import asm.model.User;
 import asm.util.DBCP;
 
 import java.sql.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
- * DAO thao tác bảng users & user_roles & roles.
+ * UserDao phiên bản đầy đủ – bao gồm:
+ *  • CRUD user
+ *  • listByDepartment / listAll
+ *  • listDepartments() / listRoles()
+ *  • setSingleRole() – gán một vai trò duy nhất
+ *  • findDeptIdByUserId() – phục vụ LeaveReviewList
  */
 public class UserDao {
     private static final String ROLE_EMPLOYEE_CODE = "EMPLOYEE";
 
-    /* ==== Tìm User ==== */
-    public User findByEmail(String email) {
-        return querySingle("SELECT id, google_id, email, full_name FROM users WHERE email=? AND active=1", email);
+    /* ========== helpers ========= */
+    private Connection open() throws SQLException { return DBCP.getDataSource().getConnection(); }
+
+    private User map(ResultSet rs) throws Exception {
+        return new User(
+                rs.getInt("id"),
+                rs.getString("google_id"),
+                rs.getString("email"),
+                rs.getString("full_name"),
+                rs.getObject("dept_id", Integer.class));
     }
 
-    public User findByGoogleId(String googleId) {
-        return querySingle("SELECT id, google_id, email, full_name FROM users WHERE google_id=? AND active=1", googleId);
-    }
-
-    private User querySingle(String sql, String param) {
-        try (Connection con = DBCP.getDataSource().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, param);
+    private User single(String sql, Object p) {
+        try (Connection c = open(); PreparedStatement ps = c.prepareStatement(sql)) {
+            if (p instanceof String) ps.setString(1, (String) p); else ps.setInt(1, (Integer) p);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return new User(
-                        rs.getInt("id"),
-                        rs.getString("google_id"),
-                        rs.getString("email"),
-                        rs.getString("full_name")
-                );
-            }
-        } catch (Exception e) {e.printStackTrace();}
+            if (rs.next()) return map(rs);
+        } catch (Exception e) { e.printStackTrace(); }
         return null;
     }
 
-    /* ==== Create User + role employee ==== */
-    public User create(String googleId, String email, String fullName) {
-        String insertUser = "INSERT INTO users(google_id,email,full_name) VALUES(?,?,?)";
-        try (Connection con = DBCP.getDataSource().getConnection();
-             PreparedStatement ps = con.prepareStatement(insertUser, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, googleId);
-            ps.setString(2, email);
-            ps.setString(3, fullName);
-            ps.executeUpdate();
-            ResultSet keys = ps.getGeneratedKeys();
-            if (keys.next()) {
-                int userId = keys.getInt(1);
-                int roleId = getRoleId(con, ROLE_EMPLOYEE_CODE);
-                if (roleId > 0) {
-                    try (PreparedStatement ps2 = con.prepareStatement("INSERT INTO user_roles(user_id,role_id) VALUES(?,?)")) {
-                        ps2.setInt(1, userId);
-                        ps2.setInt(2, roleId);
-                        ps2.executeUpdate();
-                    }
-                }
-                return new User(userId, googleId, email, fullName);
-            }
-        } catch (Exception e) {e.printStackTrace();}
-        return null;
+    /* ========== find ========= */
+    public User findById(int id)          { return single("SELECT * FROM users WHERE id=?", id); }
+    public User findByEmail(String email) { return single("SELECT * FROM users WHERE email=? AND active=1", email); }
+    public User findByGoogleId(String g)  { return single("SELECT * FROM users WHERE google_id=? AND active=1", g); }
+
+    /* ========== list ========= */
+    public List<User> listByDepartment(Integer deptId) {
+        List<User> out = new ArrayList<>();
+        String sql = (deptId==null)?
+                "SELECT * FROM users WHERE active=1 ORDER BY full_name" :
+                "SELECT * FROM users WHERE active=1 AND dept_id=? ORDER BY full_name";
+        try (Connection c=open(); PreparedStatement ps=c.prepareStatement(sql)) {
+            if (deptId!=null) ps.setInt(1, deptId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) out.add(map(rs));
+        } catch (Exception e) { e.printStackTrace(); }
+        return out;
+    }
+    public List<User> listAll() { return listByDepartment(null); }
+
+    public List<Department> listDepartments() {
+        List<Department> d = new ArrayList<>();
+        try (Connection c=open(); Statement st=c.createStatement(); ResultSet rs=st.executeQuery("SELECT id,code,name FROM departments ORDER BY name")) {
+            while (rs.next()) d.add(new Department(rs.getInt(1), rs.getString(2), rs.getString(3)));
+        } catch (Exception e) { e.printStackTrace(); }
+        return d;
+    }
+    public List<RoleOption> listRoles() {
+        List<RoleOption> r=new ArrayList<>();
+        try (Connection c=open(); Statement st=c.createStatement(); ResultSet rs=st.executeQuery("SELECT id,code,name FROM roles ORDER BY id")) {
+            while (rs.next()) r.add(new RoleOption(rs.getInt(1), rs.getString(2), rs.getString(3)));
+        } catch (Exception e) { e.printStackTrace(); }
+        return r;
     }
 
-    /* ==== Roles ==== */
-    public Set<String> getRoles(int userId) {
-        Set<String> roles = new HashSet<>();
-        String sql = "SELECT r.code FROM roles r JOIN user_roles ur ON r.id=ur.role_id WHERE ur.user_id=?";
-        try (Connection con = DBCP.getDataSource().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                roles.add(rs.getString("code"));
-            }
-        } catch (Exception e) {e.printStackTrace();}
-        return roles;
-    }
-    public Integer findDeptIdByUserId(int userId) {
-        String sql = "SELECT dept_id FROM users WHERE id = ?";
-        try (Connection con = DBCP.getDataSource().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt("dept_id");
-        } catch (Exception e) {e.printStackTrace();}
-        return null;
+    /* ========== insert & update ========= */
+    public void insert(User u, int roleId, Integer deptId) {
+        String sql="INSERT INTO users(email,full_name,dept_id,active) VALUES(?,?,?,1)";
+        try (Connection c=open(); PreparedStatement ps=c.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1,u.getEmail()); ps.setString(2,u.getFullName());
+            if(deptId==null) ps.setNull(3,Types.INTEGER); else ps.setInt(3,deptId);
+            ps.executeUpdate(); ResultSet k=ps.getGeneratedKeys();
+            if(k.next()) setSingleRole(k.getInt(1), roleId, c);
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
-    private int getRoleId(Connection con, String code) {
-        try (PreparedStatement ps = con.prepareStatement("SELECT id FROM roles WHERE code=?")) {
-            ps.setString(1, code);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
-        } catch (Exception ignored) {}
+    public void updateUser(int id,String name,Integer deptId,boolean active) {
+        String sql="UPDATE users SET full_name=?, dept_id=?, active=? WHERE id=?";
+        try (Connection c=open(); PreparedStatement ps=c.prepareStatement(sql)) {
+            ps.setString(1,name);
+            if(deptId==null) ps.setNull(2,Types.INTEGER); else ps.setInt(2,deptId);
+            ps.setBoolean(3,active); ps.setInt(4,id); ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    public void softDelete(int id) { updateUser(id, "", null, false); }
+
+    /* ========== role util ========= */
+    public void setSingleRole(int userId,int roleId) { try(Connection c=open()){ setSingleRole(userId,roleId,c);} catch(Exception e){e.printStackTrace();} }
+    private void setSingleRole(int userId,int roleId,Connection c) throws Exception {
+        try(PreparedStatement d=c.prepareStatement("DELETE FROM user_roles WHERE user_id=?")){ d.setInt(1,userId); d.executeUpdate(); }
+        try(PreparedStatement i=c.prepareStatement("INSERT INTO user_roles(user_id,role_id) VALUES(?,?)")){ i.setInt(1,userId); i.setInt(2,roleId); i.executeUpdate(); }
+    }
+
+    public int findRoleIdByCode(String code) {
+        try (Connection c=open(); PreparedStatement ps=c.prepareStatement("SELECT id FROM roles WHERE code=?")) {
+            ps.setString(1, code); ResultSet rs=ps.executeQuery(); if(rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
         return -1;
+    }
+
+    public Set<String> getRoles(int uid) {
+        Set<String> s=new HashSet<>();
+        try (Connection c=open(); PreparedStatement ps=c.prepareStatement("SELECT r.code FROM roles r JOIN user_roles ur ON r.id=ur.role_id WHERE ur.user_id=?")) {
+            ps.setInt(1,uid); ResultSet rs=ps.executeQuery(); while(rs.next()) s.add(rs.getString(1));
+        } catch (Exception e) { e.printStackTrace(); }
+        return s;
+    }
+
+    public Integer findDeptIdByUserId(int uid) {
+        User u = findById(uid);
+        return u==null?null:u.getDeptId();
+    }
+
+    /* ========== create wrapper for SSO ========= */
+    public User create(String gid,String email,String fullName){
+        int roleEmp=findRoleIdByCode(ROLE_EMPLOYEE_CODE);
+        User tmp=new User(0,gid,email,fullName,null);
+        insert(tmp,roleEmp,null);
+        return findByEmail(email);
     }
 }
