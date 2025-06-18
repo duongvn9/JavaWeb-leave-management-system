@@ -28,7 +28,9 @@ public class UserDao {
                 rs.getString("google_id"),
                 rs.getString("email"),
                 rs.getString("full_name"),
-                rs.getObject("dept_id", Integer.class));
+                rs.getObject("dept_id", Integer.class),
+                rs.getBoolean("active") 
+        );
     }
 
     private User single(String sql, Object p) {
