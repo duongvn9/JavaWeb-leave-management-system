@@ -10,6 +10,8 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Danh sách nhân viên – Leader xem phòng mình, Admin xem tất cả hoặc lọc phòng.
@@ -39,7 +41,14 @@ public class DepartmentUserListServlet extends HttpServlet {
             deptId = current.getDeptId();
         }
 
-        req.setAttribute("users", dao.listByDepartment(deptId));
+        List<User> userList = dao.listByDepartment(deptId);
+        req.setAttribute("users", userList);
+        // Map userId -> set role code
+        Map<Integer, Set<String>> rolesOfUserMap = new HashMap<>();
+        for (User u : userList) {
+            rolesOfUserMap.put(u.getId(), dao.getRoles(u.getId()));
+        }
+        req.setAttribute("rolesOfUserMap", rolesOfUserMap);
         req.setAttribute("selectedDept", deptId);
         req.getRequestDispatcher("/WEB-INF/jsp/department/userlist.jsp").forward(req, resp);
     }
