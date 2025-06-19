@@ -4,47 +4,51 @@
 <head>
     <meta charset="UTF-8">
     <title>Đăng nhập hệ thống</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body{
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
-            background: #f5f5f5;
-            margin: 0;
+            justify-content: center;
         }
         .card{
-            background: #ffffff;
-            padding: 2rem 3rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0,0,0,.1);
+            background: #fff;
+            padding: 2.5rem 3.5rem;
+            border-radius: 18px;
+            box-shadow: 0 6px 32px rgba(0,0,0,.12);
             text-align: center;
         }
-        .btn{
-            display: inline-block;
-            margin-top: 1.5rem;
-            padding: 0.75rem 1.5rem;
+        .btn-google{
+            margin-top: 2rem;
+            padding: 0.75rem 2rem;
             border: none;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
-            background: #4285F4;  
+            background: linear-gradient(90deg, #EE82EE 0%, #4285F4 100%);
             color: #fff;
-            text-decoration: none;
+            transition: background 0.2s;
+            text-decoration: none !important;
         }
-        .btn:hover{
-            box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        .btn-google:hover{
+            background: linear-gradient(90deg, #d16ba5 0%, #4285F4 100%);
+            text-decoration: none !important;
+        }
+        .fa-google {
+            margin-right: 0.5rem;
         }
     </style>
 </head>
 <body>
     <section class="card">
-        <h2>Đăng nhập hệ thống</h2>
-
-        <!-- Link chuyển tới servlet xử lý OAuth -->
-        <a class="btn" href="${pageContext.request.contextPath}/oauth2/google">
-            Sign-in with Google
+        <h2 class="mb-4"><i class="fa-solid fa-right-to-bracket"></i> Đăng nhập hệ thống quản lý nghỉ phép</h2>
+        <a class="btn-google" href="${pageContext.request.contextPath}/oauth2/google">
+            <i class="fab fa-google"></i> Đăng nhập với Google
         </a>
     </section>
 </body>
