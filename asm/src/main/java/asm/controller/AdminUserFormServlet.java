@@ -26,46 +26,60 @@ public class AdminUserFormServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        preloadDropdown(req);
         String id = req.getParameter("id");
-        if (id != null) {
+        boolean edit = id != null && !id.isBlank();
+        req.setAttribute("edit", edit);
+
+        if (edit) {
             User u = dao.findById(Integer.parseInt(id));
+            if (u == null) {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "User không tồn tại hoặc đã bị xóa.");
+                return;
+            }
             req.setAttribute("user", u);
-            Set<String> r = dao.getRoles(u.getId());
-            req.setAttribute("rolesOfUser", r);
+            Set<String> rolesOfUser = dao.getRoles(u.getId());
+            req.setAttribute("rolesOfUser", rolesOfUser);
         }
+
+        // Luôn nạp dropdown
+        List<Department> depts = dao.listDepartments();
+        List<RoleOption> roles = dao.listRoles();
+        req.setAttribute("depts", depts);
+        req.setAttribute("roles", roles);
+
         req.getRequestDispatcher("/WEB-INF/jsp/admin/userform.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         String id       = req.getParameter("id");
         String email    = req.getParameter("email");
-        String name     = req.getParameter("full_name");
-        Integer deptId  = req.getParameter("deptId").isBlank()?null:Integer.valueOf(req.getParameter("deptId"));
+        String fullName = req.getParameter("full_name");
+        Integer deptId  = req.getParameter("deptId").isBlank() ? null : Integer.valueOf(req.getParameter("deptId"));
         int roleId      = Integer.parseInt(req.getParameter("roleId"));
 
-        // ----- Check duplicate email when create -----
-        if (id == null || id.isBlank()) {
-            if (dao.findByEmail(email) != null) {
+        // Kiểm tra trùng email
+        User existing = dao.findByEmail(email);
+        if (existing != null) {
+            // trường hợp new hoặc sửa sang email của user khác
+            if (id == null || id.isBlank() || existing.getId() != Integer.parseInt(id)) {
                 req.setAttribute("error", "Email đã tồn tại, vui lòng chọn email khác!");
-                preloadDropdown(req);
-                req.getRequestDispatcher("/WEB-INF/jsp/admin/userform.jsp").forward(req, resp);
+                doGet(req, resp);
                 return;
             }
-            dao.insert(new User(0, null, email, name, deptId), roleId, deptId);
+        }
+
+        // Thực hiện lưu
+        if (id == null || id.isBlank()) {
+            // Thêm mới
+            dao.insert(new User(0, null, email, fullName, deptId), roleId, deptId);
         } else {
+            // Cập nhật (không cập nhật email)
             int uid = Integer.parseInt(id);
-            dao.updateUser(uid, name, deptId, true);
+            dao.updateUser(uid, fullName, deptId, true);
             dao.setSingleRole(uid, roleId);
         }
         resp.sendRedirect(req.getContextPath() + "/admin/users");
-    }
-
-    private void preloadDropdown(HttpServletRequest req) {
-        List<Department> depts = dao.listDepartments();
-        List<RoleOption> roles = dao.listRoles();
-        req.setAttribute("depts", depts);
-        req.setAttribute("roles", roles);
     }
 }
