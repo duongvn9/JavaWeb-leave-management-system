@@ -16,6 +16,14 @@ public class AdminUserListServlet extends HttpServlet {
     private final UserDao dao = new UserDao();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Kiểm tra thông báo thành công từ session
+        HttpSession session = req.getSession();
+        String successMessage = (String) session.getAttribute("successMessage");
+        if (successMessage != null) {
+            req.setAttribute("successMessage", successMessage);
+            session.removeAttribute("successMessage"); // Xóa thông báo sau khi đã đọc
+        }
+        
         List<User> users = dao.listAll();
         req.setAttribute("users", users);
         req.setAttribute("depts", dao.listDepartments());

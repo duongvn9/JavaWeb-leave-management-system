@@ -7,6 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
@@ -20,7 +21,12 @@ public class AdminUserDeleteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String id = req.getParameter("id");
         if (id != null && id.matches("\\d+")) {
-            dao.softDelete(Integer.parseInt(id));
+            int userId = Integer.parseInt(id);
+            dao.softDelete(userId);
+            
+            // Thêm thông báo thành công vào session
+            HttpSession session = req.getSession();
+            session.setAttribute("successMessage", "Đã xóa user thành công!");
         }
         resp.sendRedirect(req.getContextPath() + "/admin/users");
     }

@@ -112,15 +112,15 @@ public class UserDao {
     }
 
     /* ========== insert & update ========= */
-    public void insert(User u, int roleId, Integer deptId) {
+    public void insert(User u, int roleId) {
         String sql = "INSERT INTO users(email,full_name,dept_id,active) VALUES(?,?,?,1)";
         try (Connection c = open(); PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, u.getEmail());
             ps.setString(2, u.getFullName());
-            if (deptId == null) {
+            if (u.getDeptId() == null) {
                 ps.setNull(3, Types.INTEGER);
             } else {
-                ps.setInt(3, deptId);
+                ps.setInt(3, u.getDeptId());
             }
             ps.executeUpdate();
             ResultSet k = ps.getGeneratedKeys();
@@ -210,7 +210,7 @@ public class UserDao {
     public User create(String gid, String email, String fullName) {
         int roleEmp = findRoleIdByCode(ROLE_EMPLOYEE_CODE);
         User tmp = new User(0, gid, email, fullName, null);
-        insert(tmp, roleEmp, null);
+        insert(tmp, roleEmp);
         return findByEmail(email);
     }
 

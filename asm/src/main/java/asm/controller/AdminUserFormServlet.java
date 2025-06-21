@@ -10,6 +10,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +40,12 @@ public class AdminUserFormServlet extends HttpServlet {
             req.setAttribute("user", u);
             Set<String> rolesOfUser = dao.getRoles(u.getId());
             req.setAttribute("rolesOfUser", rolesOfUser);
+        } else {
+            // Đảm bảo user attribute là null khi thêm mới
+            req.setAttribute("user", null);
+            // Set role mặc định là "Nhân viên" khi thêm mới
+            int defaultRoleId = dao.findRoleIdByCode("EMPLOYEE");
+            req.setAttribute("defaultRoleId", defaultRoleId);
         }
 
         // Luôn nạp dropdown
@@ -59,27 +66,58 @@ public class AdminUserFormServlet extends HttpServlet {
         Integer deptId  = req.getParameter("deptId").isBlank() ? null : Integer.valueOf(req.getParameter("deptId"));
         int roleId      = Integer.parseInt(req.getParameter("roleId"));
 
+        boolean isEdit = id != null && !id.isBlank();
+
         // Kiểm tra trùng email
         User existing = dao.findByEmail(email);
         if (existing != null) {
             // trường hợp new hoặc sửa sang email của user khác
-            if (id == null || id.isBlank() || existing.getId() != Integer.parseInt(id)) {
+            if (!isEdit || existing.getId() != Integer.parseInt(id)) {
                 req.setAttribute("error", "Email đã tồn tại, vui lòng chọn email khác!");
-                doGet(req, resp);
+                // Set lại các attribute cần thiết cho form và giữ lại dữ liệu đã nhập
+                req.setAttribute("edit", isEdit);
+                
+                // Tạo tempUser để giữ lại dữ liệu đã nhập
+                User tempUser = new User(isEdit ? Integer.parseInt(id) : 0, null, email, fullName, deptId);
+                req.setAttribute("user", tempUser);
+                req.setAttribute("selectedRoleId", roleId);
+                
+                // Nếu đang edit, cần rolesOfUser
+                if (isEdit) {
+                    Set<String> rolesOfUser = dao.getRoles(Integer.parseInt(id));
+                    req.setAttribute("rolesOfUser", rolesOfUser);
+                }
+                
+                // Luôn nạp dropdown
+                List<Department> depts = dao.listDepartments();
+                List<RoleOption> roles = dao.listRoles();
+                req.setAttribute("depts", depts);
+                req.setAttribute("roles", roles);
+                
+                req.getRequestDispatcher("/WEB-INF/jsp/admin/userform.jsp").forward(req, resp);
                 return;
             }
         }
 
         // Thực hiện lưu
-        if (id == null || id.isBlank()) {
+        if (!isEdit) {
             // Thêm mới
-            dao.insert(new User(0, null, email, fullName, deptId), roleId, deptId);
+            dao.insert(new User(0, null, email, fullName, deptId), roleId);
         } else {
             // Cập nhật (không cập nhật email)
             int uid = Integer.parseInt(id);
             dao.updateUser(uid, fullName, deptId, true);
             dao.setSingleRole(uid, roleId);
         }
+        
+        // Thêm thông báo thành công vào session
+        HttpSession session = req.getSession();
+        if (!isEdit) {
+            session.setAttribute("successMessage", "Đã thêm user thành công!");
+        } else {
+            session.setAttribute("successMessage", "Đã cập nhật user thành công!");
+        }
+        
         resp.sendRedirect(req.getContextPath() + "/admin/users");
     }
 }

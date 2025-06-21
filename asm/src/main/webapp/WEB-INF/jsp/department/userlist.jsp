@@ -33,7 +33,7 @@
                 <label for="deptId" class="col-form-label"><i class="fa-solid fa-filter"></i> Lọc phòng ban:</label>
             </div>
             <div class="col-auto">
-                <select name="deptId" id="deptId" class="form-select" onchange="this.form.submit()">
+                <select name="deptId" id="deptId" class="form-select">
                     <option value="" <c:if test="${selected == null}">selected</c:if>>Tất cả</option>
                     <c:forEach var="d" items="${depts}">
                         <option value="${d.id}" <c:if test="${selected != null && selected == d.id}">selected</c:if>>
@@ -41,6 +41,9 @@
                         </option>
                     </c:forEach>
                 </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-filter"></i> Lọc</button>
             </div>
         </form>
     </c:if>
