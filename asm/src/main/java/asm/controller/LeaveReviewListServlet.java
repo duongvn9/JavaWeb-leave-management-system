@@ -30,9 +30,9 @@ public class LeaveReviewListServlet extends HttpServlet {
         boolean isAdmin = roles != null && roles.contains("ADMIN");
         Integer deptId = null;
         if (!isAdmin) {
-            // Tìm phòng ban của leader (giả định chỉ quản lý 1 dept, có thể mở rộng sau)
             deptId = userDao.findDeptIdByUserId(u.getId());
         }
+        // Luôn lấy tất cả đơn theo phòng ban hoặc toàn bộ, không lọc trạng thái ở backend
         List<LeaveRequest> list = leaveRequestService.listByDepartment(deptId, isAdmin);
         req.setAttribute("requests", list);
         req.getRequestDispatcher("/WEB-INF/jsp/leave/reviewlist.jsp").forward(req, resp);
