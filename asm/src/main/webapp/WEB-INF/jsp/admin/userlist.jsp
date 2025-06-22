@@ -17,20 +17,85 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f8fafc; }
-        .container { max-width: 900px; margin: 40px auto; }
-        .table thead { background: #4285F4; color: #fff; }
-        .table tbody tr:hover { background: #e3f0fd; }
+        .container { max-width: 1200px; margin: 40px auto; }
+        .table-wrapper {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: none;
+            overflow: hidden;
+            margin-top: 1.5rem;
+        }
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+        .table thead {
+            background: #6C7AE0;
+            color: #fff;
+        }
+        .table thead th {
+            background: #6C7AE0 !important;
+            color: #fff !important;
+            padding: 1rem;
+            font-weight: 500;
+            text-align: left;
+        }
+        .table thead th:first-child { border-top-left-radius: 8px; }
+        .table thead th:last-child { border-top-right-radius: 8px; }
+
+        .table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .table tbody tr:last-child {
+            border-bottom: none;
+        }
+        .table tbody td {
+            padding: 1rem;
+        }
+        .table.table-hover tbody tr:hover {
+            background: #f0f2ff !important;
+            transition: background 0.2s;
+        }
+
         .btn-add { background: #28a745; color: #fff; border-radius: 8px; }
         .btn-add:hover { background: #218838; }
         .action-btn { margin-right: 0.5rem; }
-        .back-link { color: #4285F4; text-decoration: none; }
-        .back-link:hover { text-decoration: underline; }
+        .back-link { color: #4285F4; text-decoration: none; margin-top: 1.5rem; display: inline-block;}
+        .back-link:hover { text-decoration: none; }
+        .dashboard-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1.5px solid #6C7AE0;
+            border-radius: 8px;
+            padding: 0.4rem 1.1rem 0.4rem 0.9rem;
+            background: #fff;
+            color: #6C7AE0;
+            font-weight: 500;
+            font-size: 1rem;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            margin-top: 1.2rem;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(108,122,224,0.04);
+        }
+        .dashboard-link:hover {
+            background: #6C7AE0;
+            color: #fff;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2 class="mb-4"><i class="fa-solid fa-users"></i> Danh sách người dùng</h2>
-    <a href="${pageContext.request.contextPath}/admin/users/form" class="btn btn-add mb-3"><i class="fa-solid fa-user-plus"></i> Thêm user</a>
+    <a href="${pageContext.request.contextPath}/app/dashboard" class="dashboard-link">
+        <i class="fa-solid fa-house"></i> Dashboard
+    </a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="fa-solid fa-users"></i> Danh sách người dùng</h2>
+        <a href="${pageContext.request.contextPath}/admin/users/form" class="btn btn-add"><i class="fa-solid fa-user-plus"></i> Thêm user</a>
+    </div>
     
     <!-- Toast thông báo thành công ở góc trên bên phải -->
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
@@ -46,16 +111,20 @@
         </div>
     </div>
     
+    <div class="table-wrapper">
     <table class="table table-hover align-middle">
         <thead>
             <tr>
-                <th>ID</th><th>Tên</th><th>Email</th><th>Phòng</th><th>Active</th><th>Action</th>
+                <th>STT</th>
+                <th>ID</th><th>Tên</th><th>Email</th><th>Phòng</th><th>Action</th>
             </tr>
         </thead>
         <tbody>
+        <c:set var="stt" value="1" />
         <c:forEach var="u" items="${users}">
             <c:set var="userRoles" value="${rolesOfUserMap[u.id]}" />
-            <tr <c:if test="${userRoles != null && userRoles.contains('LEADER')}">class='table-warning'</c:if>>
+            <tr>
+                <td>${stt}</td>
                 <td>${u.id}</td>
                 <td>${u.fullName}</td>
                 <td>${u.email}</td>
@@ -69,7 +138,6 @@
                         </c:otherwise>
                     </c:choose>
                 </td>
-                <td>${u.active ? '<i class="fa-solid fa-check text-success"></i>' : ''}</td>
                 <td>
                     <a href="${pageContext.request.contextPath}/admin/users/form?id=${u.id}" class="btn btn-sm btn-primary action-btn"><i class="fa-solid fa-pen-to-square"></i> Sửa</a>
                     <c:if test="${u.active}">
@@ -82,10 +150,11 @@
                     </c:if>
                 </td>
             </tr>
+            <c:set var="stt" value="${stt + 1}" />
         </c:forEach>
         </tbody>
     </table>
-    <a href="${pageContext.request.contextPath}/app/dashboard" class="back-link"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+    </div>
 </div>
 
 <!-- Modal xác nhận xóa user -->
