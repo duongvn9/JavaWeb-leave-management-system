@@ -58,4 +58,8 @@ public class LeaveRequestService {
     public List<LeaveRequest> listByDepartment(Integer deptId, boolean isAdmin) {
         return dao.listByDepartment(deptId, isAdmin);
     }
+
+    public List<LeaveRequest> listByEmployeeAndStatus(int empId, String status) {
+        return dao.listByEmployeeAndStatus(empId, status);
+    }
 }
