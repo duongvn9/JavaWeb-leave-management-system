@@ -5,7 +5,7 @@
 Đây là hệ thống quản lý nghỉ phép cho doanh nghiệp, xây dựng bằng Java Servlet/JSP, tuân thủ mô hình MVC, sử dụng Jakarta EE, JSTL, JDBC và Google OAuth. Hệ thống hỗ trợ phân quyền (RBAC) cho các vai trò: Admin, Leader, Employee.
 
 - **Tác giả:** duongvn9
-- **Phiên bản:** 1.0
+- **Phiên bản:** 1.4
 - **Github:** https://github.com/duongvn9/JavaWeb-leave-management-system
 
 ## Cấu trúc dự án
@@ -22,7 +22,7 @@ asm/
 │   │   │   ├── util/         # Tiện ích, cấu hình
 │   │   │   ├── filter/       # RBAC Filter
 │   │   │   ├── integrations/ # Tích hợp ngoài (Google OAuth, Gemini...)
-│   │   ├── resources/        # Cấu hình, schema.sql
+│   │   ├── resources/        # Cấu hình, script.sql
 │   │   ├── webapp/
 │   │   │   ├── WEB-INF/jsp/  # Giao diện JSP (dashboard, leave, admin...)
 │   │   │   ├── WEB-INF/web.xml # Cấu hình web
@@ -62,7 +62,7 @@ asm/
 - Leader chỉ xem/duyệt đơn của phòng mình.
 
 ### 8. Cơ sở dữ liệu
-- SQL Server, file `schema.sql` cung cấp cấu trúc bảng và dữ liệu mẫu.
+- SQL Server, file `script.sql` cung cấp cấu trúc bảng và dữ liệu mẫu.
 - Các bảng chính: users, departments, roles, user_roles, leave_requests, approvals, annual_leave_quota.
 
 ## Công nghệ sử dụng
@@ -76,10 +76,10 @@ asm/
 ## Hướng dẫn cài đặt
 1. Clone project về máy.
 2. Import vào IDE (IntelliJ/NetBeans/Eclipse) dạng Maven project.
-3. Cấu hình DB SQL Server, import file `schema.sql`.
+3. Cấu hình DB SQL Server, import file `script.sql`.
 4. Cập nhật thông tin Google OAuth trong file cấu hình.
 5. Build và deploy lên server (Tomcat/Payara...)
 
 ---
 
-> Mọi thắc mắc vui lòng liên hệ tác giả qua Github hoặc Facebook. 
+> Mọi thắc mắc vui lòng liên hệ tác giả qua Github hoặc Facebook.
