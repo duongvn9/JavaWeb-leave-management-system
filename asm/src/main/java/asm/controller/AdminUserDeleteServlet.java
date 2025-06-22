@@ -22,7 +22,7 @@ public class AdminUserDeleteServlet extends HttpServlet {
         String id = req.getParameter("id");
         if (id != null && id.matches("\\d+")) {
             int userId = Integer.parseInt(id);
-            dao.softDelete(userId);
+            dao.hardDelete(userId);
             
             // Thêm thông báo thành công vào session
             HttpSession session = req.getSession();
