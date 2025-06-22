@@ -15,13 +15,71 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f8fafc; }
-        .container { max-width: 1000px; margin: 40px auto; }
-        .table thead { background: #4285F4; color: #fff; }
-        .table tbody tr:hover { background: #e3f0fd; }
+        .container { max-width: 1200px; margin: 40px auto; }
+        .table-wrapper {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: none;
+            overflow: hidden;
+        }
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+        .table thead {
+            background: #6C7AE0;
+            color: #fff;
+        }
+        .table thead th {
+            background: #6C7AE0 !important;
+            color: #fff !important;
+            padding: 1rem;
+            font-weight: 500;
+            text-align: left;
+        }
+        .table thead th:first-child { border-top-left-radius: 8px; }
+        .table thead th:last-child { border-top-right-radius: 8px; }
+
+        .table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .table tbody tr:last-child {
+            border-bottom: none;
+        }
+        .table tbody td {
+            padding: 1rem;
+        }
+        .table.table-hover tbody tr:hover {
+            background: #f0f2ff !important;
+            transition: background 0.2s;
+        }
         .action-btn { margin-right: 0.5rem; }
-        .back-link { color: #4285F4; text-decoration: none; }
-        .back-link:hover { text-decoration: underline; }
+        .back-link { color: #4285F4; text-decoration: none; margin-top: 1.5rem; display: inline-block; }
+        .back-link:hover { text-decoration: none; }
         .filter-form { margin-bottom: 1.5rem; }
+        .dashboard-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1.5px solid #6C7AE0;
+            border-radius: 8px;
+            padding: 0.4rem 1.1rem 0.4rem 0.9rem;
+            background: #fff;
+            color: #6C7AE0;
+            font-weight: 500;
+            font-size: 1rem;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            margin-top: 1.2rem;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(108,122,224,0.04);
+        }
+        .dashboard-link:hover {
+            background: #6C7AE0;
+            color: #fff;
+            text-decoration: none;
+        }
     </style>
     <script>
         function submitOnChange() {
@@ -31,20 +89,29 @@
 </head>
 <body>
 <div class="container">
-    <h2 class="mb-4"><i class="fa-solid fa-clipboard-check"></i> Danh sách đơn nghỉ phép của nhân viên</h2>
-    <form id="filterForm" method="get" action="${pageContext.request.contextPath}/app/leave/reviewlist" class="row g-2 align-items-center filter-form">
-        <div class="col-auto">
-            <label for="status" class="col-form-label"><i class="fa-solid fa-filter"></i> Lọc trạng thái:</label>
-        </div>
-        <div class="col-auto">
-            <select name="status" id="status" class="form-select" onchange="submitOnChange()">
-                <option value="ALL" ${param.status == null || param.status == 'ALL' ? 'selected' : ''}>Tất cả</option>
-                <option value="INPROGRESS" ${param.status == 'INPROGRESS' ? 'selected' : ''}>Chưa duyệt</option>
-                <option value="APPROVED" ${param.status == 'APPROVED' ? 'selected' : ''}>Đã duyệt</option>
-                <option value="REJECTED" ${param.status == 'REJECTED' ? 'selected' : ''}>Bị từ chối</option>
-            </select>
-        </div>
-    </form>
+    <a href="${pageContext.request.contextPath}/app/dashboard" class="dashboard-link">
+        <i class="fa-solid fa-house"></i> Dashboard
+    </a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="fa-solid fa-inbox"></i> Duyệt đơn nghỉ phép</h2>
+        <form method="get" action="${pageContext.request.contextPath}/app/leave/reviewlist" class="row g-2 align-items-center">
+            <div class="col-auto">
+                <label for="status" class="col-form-label"><i class="fa-solid fa-filter"></i> Trạng thái:</label>
+            </div>
+            <div class="col-auto">
+                <select name="status" id="status" class="form-select">
+                    <option value="" <c:if test="${empty param.status}">selected</c:if>>Tất cả</option>
+                    <option value="PENDING" <c:if test="${param.status == 'PENDING'}">selected</c:if>>Chờ duyệt</option>
+                    <option value="APPROVED" <c:if test="${param.status == 'APPROVED'}">selected</c:if>>Đã duyệt</option>
+                    <option value="REJECTED" <c:if test="${param.status == 'REJECTED'}">selected</c:if>>Từ chối</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-filter"></i> Lọc</button>
+            </div>
+        </form>
+    </div>
+    <div class="table-wrapper">
     <table class="table table-hover align-middle">
         <thead>
             <tr>
@@ -63,7 +130,7 @@
         <tbody>
         <c:set var="stt" value="1" />
         <c:forEach var="r" items="${requests}">
-            <c:if test="${param.status == null || param.status == 'ALL' || r.status == param.status}">
+            <c:if test="${empty param.status || r.status == param.status}">
                 <tr>
                     <td>${stt}</td>
                     <td>${r.id}</td>
@@ -104,7 +171,7 @@
         </c:forEach>
         </tbody>
     </table>
-    <a href="${pageContext.request.contextPath}/app/dashboard" class="back-link"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+    </div>
 </div>
 </body>
 </html>
