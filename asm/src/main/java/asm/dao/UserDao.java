@@ -231,4 +231,22 @@ public class UserDao {
         }
         return null;
     }
+
+    // XÓA CỨNG USER
+    public void hardDelete(int id) {
+        try (Connection c = open()) {
+            // Xóa các role liên quan trước
+            try (PreparedStatement d = c.prepareStatement("DELETE FROM user_roles WHERE user_id=?")) {
+                d.setInt(1, id);
+                d.executeUpdate();
+            }
+            // Xóa user
+            try (PreparedStatement d = c.prepareStatement("DELETE FROM users WHERE id=?")) {
+                d.setInt(1, id);
+                d.executeUpdate();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

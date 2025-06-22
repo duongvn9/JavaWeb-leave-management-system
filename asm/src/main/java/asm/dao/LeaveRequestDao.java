@@ -149,4 +149,20 @@ public class LeaveRequestDao {
             e.printStackTrace();
         }
     }
+
+    public List<LeaveRequest> listByEmployeeAndStatus(int empId, String status) {
+        List<LeaveRequest> list = new ArrayList<>();
+        String sql = "SELECT lr.*, u.full_name emp_name, u.dept_id FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE lr.employee_id=? AND lr.status=? ORDER BY lr.created_at DESC";
+        try (Connection con = DBCP.getDataSource().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, empId);
+            ps.setString(2, status);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(map(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
