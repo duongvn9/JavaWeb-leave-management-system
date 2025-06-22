@@ -26,7 +26,7 @@ public class LeaveRequestEditServlet extends HttpServlet {
         User u = (User) req.getSession(false).getAttribute("user");
         int id = Integer.parseInt(req.getParameter("id"));
         LeaveRequest lr = service.findById(id);
-        if (u == null || lr == null || lr.getEmployeeId() != u.getId() || !"INPROGRESS".equals(lr.getStatus())) {
+        if (u == null || lr == null || lr.getEmployeeId() != u.getId()) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -39,14 +39,20 @@ public class LeaveRequestEditServlet extends HttpServlet {
         User u = (User) req.getSession(false).getAttribute("user");
         int id = Integer.parseInt(req.getParameter("id"));
         LeaveRequest lr = service.findById(id);
-        if (u == null || lr == null || lr.getEmployeeId() != u.getId() || !"INPROGRESS".equals(lr.getStatus())) {
+        if (u == null || lr == null || lr.getEmployeeId() != u.getId()) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        if (!"INPROGRESS".equals(lr.getStatus())) {
+            req.getSession(false).setAttribute("errorMessage", "Thao tác thất bại: Đơn #" + id + " đã được xử lý hoặc đã bị huỷ.");
+            resp.sendRedirect(req.getContextPath() + "/app/leave/list");
             return;
         }
         LocalDate from = LocalDate.parse(req.getParameter("from_date"));
         LocalDate to   = LocalDate.parse(req.getParameter("to_date"));
         String reason  = req.getParameter("reason");
         service.update(id, from, to, reason, true);
+        req.getSession(false).setAttribute("successMessage", "Đã cập nhật đơn nghỉ phép #" + id + " thành công!");
         resp.sendRedirect(req.getContextPath() + "/app/leave/list");
     }
 }
