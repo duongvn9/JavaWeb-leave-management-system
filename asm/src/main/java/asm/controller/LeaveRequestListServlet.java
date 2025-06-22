@@ -27,8 +27,27 @@ public class LeaveRequestListServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/signin");
             return;
         }
-        List<LeaveRequest> list = service.listByEmployee(u.getId());
+        String status = req.getParameter("status");
+        List<LeaveRequest> list;
+        if (status != null && !status.isEmpty()) {
+            list = service.listByEmployeeAndStatus(u.getId(), status);
+        } else {
+            list = service.listByEmployee(u.getId());
+        }
         req.setAttribute("requests", list);
+
+        // Hiển thị thông báo thành công hoặc lỗi (nếu có)
+        String successMessage = (String) req.getSession(false).getAttribute("successMessage");
+        if (successMessage != null) {
+            req.setAttribute("successMessage", successMessage);
+            req.getSession(false).removeAttribute("successMessage");
+        }
+        String errorMessage = (String) req.getSession(false).getAttribute("errorMessage");
+        if (errorMessage != null) {
+            req.setAttribute("errorMessage", errorMessage);
+            req.getSession(false).removeAttribute("errorMessage");
+        }
+
         req.getRequestDispatcher("/WEB-INF/jsp/leave/list.jsp").forward(req, resp);
     }
 }
