@@ -50,26 +50,26 @@
     <body>
         <div class="form-card">
             <h2><i class="fa-solid fa-user-edit"></i> <c:choose><c:when test="${edit}">Sửa</c:when><c:otherwise>Thêm</c:otherwise></c:choose> người dùng</h2>
-            <form method="post" action="${pageContext.request.contextPath}/admin/users/form">
+            <form id="userForm" method="post" action="${pageContext.request.contextPath}/admin/users/form">
                 <c:if test="${edit}">
                     <input type="hidden" name="id" value="${user.id}" />
                 </c:if>
                 <div class="mb-3">
                     <label class="form-label">Email:</label>
-                    <input type="email" class="form-control" name="email"
+                    <input type="email" class="form-control" name="email" id="email"
                         value="<c:out value='${edit || not empty error ? user.email : ""}'/>"
                         <c:if test="${edit}">readonly</c:if>
                         required/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Họ tên:</label>
-                    <input type="text" class="form-control" name="full_name" 
+                    <input type="text" class="form-control" name="full_name" id="fullName"
                         value="<c:out value='${edit || not empty error ? user.fullName : ""}'/>" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Phòng ban:</label>
-                    <select class="form-select" name="deptId">
-                        <option value="">-- Không --</option>
+                    <select class="form-select" name="deptId" id="deptId" required>
+                        <option value="" disabled selected>Phòng ban</option>
                         <c:forEach var="d" items="${depts}">
                             <option value="${d.id}" <c:if test="${(edit || not empty error) && user.deptId == d.id}">selected</c:if>>${d.name}</option>
                         </c:forEach>
@@ -77,7 +77,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Vai trò:</label>
-                    <select class="form-select" name="roleId">
+                    <select class="form-select" name="roleId" id="roleId">
                         <c:forEach var="r" items="${roles}">
                             <option value="${r.id}" 
                                 <c:choose>
@@ -92,6 +92,38 @@
             </form>
             <br>
             <a href="${pageContext.request.contextPath}/admin/users" class="back-link"><i class="fa-solid fa-arrow-left"></i> Danh sách</a>
+        </div>
+
+        <!-- Modal xác nhận lưu user -->
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmModalLabel">
+                            <i class="fa-solid fa-question-circle text-info"></i> Xác nhận <c:choose><c:when test="${edit}">cập nhật</c:when><c:otherwise>thêm mới</c:otherwise></c:choose>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Bạn có chắc chắn muốn <c:choose><c:when test="${edit}">cập nhật</c:when><c:otherwise>thêm mới</c:otherwise></c:choose> user này?</p>
+                        <div class="alert alert-info">
+                            <c:if test="${edit}">
+                                <strong>ID:</strong> <span id="confirmUserId">${user.id}</span><br>
+                            </c:if>
+                            <strong>Email:</strong> <span id="confirmUserEmail"></span><br>
+                            <strong>Họ tên:</strong> <span id="confirmUserName"></span><br>
+                            <strong>Phòng ban:</strong> <span id="confirmUserDept"></span><br>
+                            <strong>Vai trò:</strong> <span id="confirmUserRole"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" id="confirmSaveBtn" class="btn btn-primary">
+                            <i class="fa-solid fa-save"></i> Xác nhận <c:choose><c:when test="${edit}">cập nhật</c:when><c:otherwise>thêm mới</c:otherwise></c:choose>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Modal thông báo lỗi -->
@@ -127,7 +159,40 @@
                     var errorModal = new bootstrap.Modal(errorModalElement);
                     errorModal.show();
                 }
+                
+                // Xử lý sự kiện submit form
+                var userForm = document.getElementById('userForm');
+                userForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    showConfirmModal();
+                });
+                
+                // Xử lý sự kiện click nút xác nhận
+                document.getElementById('confirmSaveBtn').addEventListener('click', function() {
+                    userForm.submit();
+                });
             });
+            
+            function showConfirmModal() {
+                // Lấy thông tin từ form
+                var email = document.getElementById('email').value;
+                var fullName = document.getElementById('fullName').value;
+                var deptSelect = document.getElementById('deptId');
+                var roleSelect = document.getElementById('roleId');
+                
+                var deptText = deptSelect.options[deptSelect.selectedIndex].text;
+                var roleText = roleSelect.options[roleSelect.selectedIndex].text;
+                
+                // Cập nhật thông tin trong modal
+                document.getElementById('confirmUserEmail').textContent = email;
+                document.getElementById('confirmUserName').textContent = fullName;
+                document.getElementById('confirmUserDept').textContent = deptText;
+                document.getElementById('confirmUserRole').textContent = roleText;
+                
+                // Hiển thị modal
+                var confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                confirmModal.show();
+            }
         </script>
     </body>
 </html>
