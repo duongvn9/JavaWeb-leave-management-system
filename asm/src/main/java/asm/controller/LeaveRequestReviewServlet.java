@@ -49,11 +49,21 @@ public class LeaveRequestReviewServlet extends HttpServlet {
         String action = req.getParameter("action"); // APPROVE or REJECT
         String note = req.getParameter("note");
         LeaveRequest lr = service.findById(id);
-        if (!isAllowed(req, approver, lr) || !"INPROGRESS".equals(lr.getStatus())) {
+
+        if (!isAllowed(req, approver, lr)) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
+
+        // Race condition: nhân viên đã huỷ đơn trong lúc sếp đang review
+        if (!"INPROGRESS".equals(lr.getStatus())) {
+            req.setAttribute("errorMessage", "Thao tác thất bại do nhân viên đã thay đổi hoặc huỷ đơn này.");
+            req.getRequestDispatcher("/WEB-INF/jsp/error/action-failed.jsp").forward(req, resp);
+            return;
+        }
+
         service.approveOrReject(id, approver.getId(), roles.contains("ADMIN"), action, note);
+        // TODO: success message
         resp.sendRedirect(req.getContextPath() + "/app/leave/reviewlist");
     }
 
