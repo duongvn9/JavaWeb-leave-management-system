@@ -20,11 +20,17 @@ public class LeaveRequestCancelServlet extends HttpServlet {
         User u = (User) req.getSession(false).getAttribute("user");
         int id = Integer.parseInt(req.getParameter("id"));
         LeaveRequest lr = service.findById(id);
-        if (u == null || lr == null || lr.getEmployeeId() != u.getId() || !"INPROGRESS".equals(lr.getStatus())) {
+        if (u == null || lr == null || lr.getEmployeeId() != u.getId()) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
+        if (!"INPROGRESS".equals(lr.getStatus())) {
+            req.getSession(false).setAttribute("errorMessage", "Thao tác thất bại: Đơn #" + id + " đã được xử lý hoặc đã bị huỷ.");
+            resp.sendRedirect(req.getContextPath() + "/app/leave/list");
+            return;
+        }
         service.cancel(id);
+        req.getSession(false).setAttribute("successMessage", "Đã huỷ đơn nghỉ phép #" + id + " thành công.");
         resp.sendRedirect(req.getContextPath() + "/app/leave/list");
     }
 }
