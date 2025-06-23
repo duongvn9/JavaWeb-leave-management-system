@@ -49,7 +49,8 @@ public class RbacFilter implements Filter {
         if (isAllowed(path, roles)) {
             chain.doFilter(req, res);
         } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+            // response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+            request.getRequestDispatcher("/WEB-INF/jsp/error/403.jsp").forward(request, response);
         }
     }
 
