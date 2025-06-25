@@ -291,7 +291,7 @@
     <div class="foreground">
         <div class="bouncer">
             <div class="head">
-                <img src="<%=request.getContextPath()%>/images/hn.png" alt="face" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; position: relative; top: 0; left: 0;" />
+                <img src="<%=request.getContextPath()%>/images/sonnt.png" alt="face" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; position: relative; top: 0; left: 0;" />
             </div>
             <div class="body"></div>
             <div class="arm"></div>
