@@ -43,6 +43,27 @@
             .back-link:hover {
                 text-decoration: underline;
             }
+            .dashboard-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                border: 1.5px solid #6C7AE0;
+                border-radius: 8px;
+                padding: 0.4rem 1.1rem 0.4rem 0.9rem;
+                background: #fff;
+                color: #6C7AE0;
+                font-weight: 500;
+                font-size: 1rem;
+                text-decoration: none;
+                margin-bottom: 1.5rem;
+                transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+                box-shadow: 0 2px 8px rgba(108,122,224,0.04);
+            }
+            .dashboard-link:hover {
+                background: #6C7AE0;
+                color: #fff;
+                text-decoration: none;
+            }
             .modal-date-error {
                 display: none;
                 position: fixed;
@@ -71,6 +92,11 @@
         </style>
     </head>
     <body>
+        <div style="max-width: 480px; margin: 40px auto 10px auto;">
+            <a href="${pageContext.request.contextPath}/app/dashboard" class="dashboard-link">
+                <i class="fa-solid fa-house"></i> Dashboard
+            </a>
+        </div>
         <div class="form-card">
             <h2><i class="fa-solid fa-file-circle-plus"></i> Tạo đơn nghỉ phép</h2>
             <form method="post" action="${pageContext.request.contextPath}/app/leave/create" id="leaveForm">
@@ -137,8 +163,7 @@
                             closeModal();
                     };
                 });
-            </script>            <br>
-            <a href="${pageContext.request.contextPath}/app/dashboard" class="back-link"><i class="fa-solid fa-arrow-left"></i> Quay lại Dashboard</a>
+            </script>
         </div>
     </body>
 </html>

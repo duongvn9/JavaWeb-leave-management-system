@@ -101,9 +101,10 @@
             <div class="col-auto">
                 <select name="status" id="status" class="form-select">
                     <option value="" <c:if test="${empty param.status}">selected</c:if>>Tất cả</option>
-                    <option value="PENDING" <c:if test="${param.status == 'PENDING'}">selected</c:if>>Chờ duyệt</option>
+                    <option value="INPROGRESS" <c:if test="${param.status == 'INPROGRESS'}">selected</c:if>>Chờ duyệt</option>
                     <option value="APPROVED" <c:if test="${param.status == 'APPROVED'}">selected</c:if>>Đã duyệt</option>
                     <option value="REJECTED" <c:if test="${param.status == 'REJECTED'}">selected</c:if>>Từ chối</option>
+                    <option value="CANCELLED" <c:if test="${param.status == 'CANCELLED'}">selected</c:if>>Đã hủy</option>
                 </select>
             </div>
             <div class="col-auto">
@@ -130,44 +131,45 @@
         <tbody>
         <c:set var="stt" value="1" />
         <c:forEach var="r" items="${requests}">
-            <c:if test="${empty param.status || r.status == param.status}">
-                <tr>
-                    <td>${stt}</td>
-                    <td>${r.id}</td>
-                    <td>${r.employeeName} (ID: ${r.employeeId})</td>
-                    <td>${r.fromDate}</td>
-                    <td>${r.toDate}</td>
-                    <td>${r.reason}</td>
-                    <td>
-                        <c:choose>
-                            <c:when test="${r.status eq 'INPROGRESS'}">
-                                <span class="badge bg-primary">Chờ duyệt</span>
-                            </c:when>
-                            <c:when test="${r.status eq 'APPROVED'}">
-                                <span class="badge bg-success">Đã duyệt</span>
-                            </c:when>
-                            <c:when test="${r.status eq 'REJECTED'}">
-                                <span class="badge bg-danger">Bị từ chối</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="badge bg-secondary">${r.status}</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </td>
-                    <td>
-                        <c:if test="${r.edited}">
-                            <i class="fa-solid fa-check text-success"></i>
-                        </c:if>
-                    </td>
-                    <td>${r.createdAt}</td>
-                    <td>
-                        <c:if test="${r.status eq 'INPROGRESS'}">
-                            <a href="${pageContext.request.contextPath}/app/leave/review?id=${r.id}" class="btn btn-sm btn-primary action-btn"><i class="fa-solid fa-eye"></i> Xem &amp; Duyệt</a>
-                        </c:if>
-                    </td>
-                </tr>
-                <c:set var="stt" value="${stt + 1}" />
-            </c:if>
+            <tr>
+                <td>${stt}</td>
+                <td>${r.id}</td>
+                <td>${r.employeeName} (ID: ${r.employeeId})</td>
+                <td>${r.fromDate}</td>
+                <td>${r.toDate}</td>
+                <td>${r.reason}</td>
+                <td>
+                    <c:choose>
+                        <c:when test="${r.status eq 'INPROGRESS'}">
+                            <span class="badge bg-primary">Chờ duyệt</span>
+                        </c:when>
+                        <c:when test="${r.status eq 'APPROVED'}">
+                            <span class="badge bg-success">Đã duyệt</span>
+                        </c:when>
+                        <c:when test="${r.status eq 'REJECTED'}">
+                            <span class="badge bg-danger">Bị từ chối</span>
+                        </c:when>
+                        <c:when test="${r.status eq 'CANCELLED'}">
+                            <span class="badge bg-warning text-dark">Đã hủy</span>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="badge bg-secondary">${r.status}</span>
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+                <td>
+                    <c:if test="${r.edited}">
+                        <i class="fa-solid fa-check text-success"></i>
+                    </c:if>
+                </td>
+                <td>${r.createdAt}</td>
+                <td>
+                    <c:if test="${r.status eq 'INPROGRESS'}">
+                        <a href="${pageContext.request.contextPath}/app/leave/review?id=${r.id}" class="btn btn-sm btn-primary action-btn"><i class="fa-solid fa-eye"></i> Xem &amp; Duyệt</a>
+                    </c:if>
+                </td>
+            </tr>
+            <c:set var="stt" value="${stt + 1}" />
         </c:forEach>
         </tbody>
     </table>
