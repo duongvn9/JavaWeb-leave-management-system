@@ -22,4 +22,9 @@
         <location>/WEB-INF/jsp/error/403.jsp</location>
     </error-page>
 
+    <error-page>
+        <error-code>400</error-code>
+        <location>/WEB-INF/jsp/error/400.jsp</location>
+    </error-page>
+
 </web-app>
