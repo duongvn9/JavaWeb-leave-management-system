@@ -2,6 +2,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="asm.model.LeaveRequest" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <%
     @SuppressWarnings("unchecked")
     List<LeaveRequest> requests = (List<LeaveRequest>) request.getAttribute("requests");
@@ -15,18 +16,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f8fafc; }
-        .container { max-width: 1200px; margin: 40px auto; }
-        .table-wrapper {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: none;
-            overflow: hidden;
-        }
-        .table {
-            border-collapse: separate;
-            border-spacing: 0;
-            width: 100%;
-        }
+        .container { max-width: 95vw; width: 95vw; margin: 0 auto; padding: 0; }
+        .table-wrapper { width: 95vw; max-width: 95vw; margin: 0 auto; padding: 0; }
+        .table { width: 95vw; min-width: 95vw; }
         .table thead {
             background: #6C7AE0;
             color: #fff;
@@ -34,13 +26,30 @@
         .table thead th {
             background: #6C7AE0 !important;
             color: #fff !important;
-            padding: 1rem;
+            padding: 0.75rem;
             font-weight: 500;
-            text-align: left;
+            text-align: center;
+            border-right: 1px solid #dee2e6;
+            border-bottom: 1px solid #dee2e6;
         }
         .table thead th:first-child { border-top-left-radius: 8px; }
-        .table thead th:last-child { border-top-right-radius: 8px; }
-
+        .table thead th:last-child { border-top-right-radius: 8px; border-right: none; }
+        .table thead th, .table tbody td {
+            white-space: nowrap;
+            border-right: 1px solid #dee2e6;
+            border-bottom: 1px solid #dee2e6;
+            text-align: center;
+        }
+        .table thead th:last-child, .table tbody td:last-child {
+            border-right: none;
+        }
+        @media (max-width: 900px) {
+            .table { min-width: 600px; }
+        }
+        @media (max-width: 600px) {
+            .table { min-width: 400px; font-size: 0.95rem; }
+            .table thead th, .table tbody td { padding: 0.5rem; }
+        }
         .table tbody tr {
             border-bottom: 1px solid #f0f0f0;
         }
@@ -85,6 +94,27 @@
         function submitOnChange() {
             document.getElementById('filterForm').submit();
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Xử lý rút gọn lý do
+            document.querySelectorAll('td .reason-cell').forEach(function(cell) {
+                var btn = cell.parentElement.querySelector('.reason-toggle');
+                if (btn) {
+                    btn.addEventListener('click', function() {
+                        if (cell.style.whiteSpace === 'nowrap') {
+                            cell.style.whiteSpace = 'normal';
+                            cell.style.overflow = 'visible';
+                            cell.style.textOverflow = 'unset';
+                            btn.textContent = 'Ẩn bớt';
+                        } else {
+                            cell.style.whiteSpace = 'nowrap';
+                            cell.style.overflow = 'hidden';
+                            cell.style.textOverflow = 'ellipsis';
+                            btn.textContent = 'Xem thêm';
+                        }
+                    });
+                }
+            });
+        });
     </script>
 </head>
 <body>
@@ -112,7 +142,7 @@
             </div>
         </form>
     </div>
-    <div class="table-wrapper">
+    <div class="table-wrapper table-responsive">
     <table class="table table-hover align-middle">
         <thead>
             <tr>
@@ -125,6 +155,7 @@
                 <th>Trạng thái</th>
                 <th>Đã sửa?</th>
                 <th>Ngày tạo</th>
+                <th>Người duyệt</th>
                 <th>Thao tác</th>
             </tr>
         </thead>
@@ -137,7 +168,14 @@
                 <td>${r.employeeName} (ID: ${r.employeeId})</td>
                 <td>${r.fromDate}</td>
                 <td>${r.toDate}</td>
-                <td>${r.reason}</td>
+                <td>
+                    <div class="reason-cell" style="max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: middle;">
+                        <span class="reason-text">${r.reason}</span>
+                    </div>
+                    <c:if test="${fn:length(r.reason) >= 20}">
+                        <button type="button" class="btn btn-link btn-sm p-0 ms-1 reason-toggle">Xem thêm</button>
+                    </c:if>
+                </td>
                 <td>
                     <c:choose>
                         <c:when test="${r.status eq 'INPROGRESS'}">
@@ -163,6 +201,13 @@
                     </c:if>
                 </td>
                 <td>${r.createdAt}</td>
+                <td>
+                    <c:choose>
+                        <c:when test="${r.approverType eq 'AI'}">Tự động</c:when>
+                        <c:when test="${r.approverType eq 'USER'}">${r.approvedBy}</c:when>
+                        <c:otherwise>—</c:otherwise>
+                    </c:choose>
+                </td>
                 <td>
                     <c:if test="${r.status eq 'INPROGRESS'}">
                         <a href="${pageContext.request.contextPath}/app/leave/review?id=${r.id}" class="btn btn-sm btn-primary action-btn"><i class="fa-solid fa-eye"></i> Xem &amp; Duyệt</a>
