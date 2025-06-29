@@ -24,32 +24,27 @@
             overflow: hidden;
         }
         .table {
-            border-collapse: separate;
+            border-collapse: collapse;
             border-spacing: 0;
             width: 100%;
         }
-        .table thead {
-            background: #6C7AE0;
-            color: #fff;
+        .table th, .table td {
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            vertical-align: middle;
         }
         .table thead th {
             background: #6C7AE0 !important;
             color: #fff !important;
             padding: 1rem;
             font-weight: 500;
-            text-align: left;
-        }
-        .table thead th:first-child { border-top-left-radius: 8px; }
-        .table thead th:last-child { border-top-right-radius: 8px; }
-
-        .table tbody tr {
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .table tbody tr:last-child {
-            border-bottom: none;
+            text-align: center;
+            vertical-align: middle;
         }
         .table tbody td {
             padding: 1rem;
+            text-align: center;
+            vertical-align: middle;
         }
         .table.table-hover tbody tr:hover {
             background: #f0f2ff !important;
@@ -135,9 +130,14 @@
                     <c:choose>
                         <c:when test="${u.deptId == null}">-</c:when>
                         <c:otherwise>
-                            <c:forEach var="d" items="${depts}">
-                                <c:if test="${d.id == u.deptId}">${d.name}</c:if>
-                            </c:forEach>
+                            <c:choose>
+                                <c:when test="${not empty depts}">
+                                    <c:forEach var="d" items="${depts}">
+                                        <c:if test="${d.id == u.deptId}">${d.name}</c:if>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>${u.deptId}</c:otherwise>
+                            </c:choose>
                         </c:otherwise>
                     </c:choose>
                 </td>

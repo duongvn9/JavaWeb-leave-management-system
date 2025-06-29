@@ -11,6 +11,8 @@
     String error = (String) request.getAttribute("error");
     Integer selectedRoleId = (Integer) request.getAttribute("selectedRoleId");
     Integer defaultRoleId = (Integer) request.getAttribute("defaultRoleId");
+    boolean reactivate = (Boolean) request.getAttribute("reactivate");
+    User deactivatedUser = (User) request.getAttribute("deactivatedUser");
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -150,6 +152,45 @@
         </div>
         </c:if>
 
+        <!-- Modal thông báo kích hoạt lại user -->
+        <c:if test="${reactivate}">
+        <div class="modal fade" id="reactivateModal" tabindex="-1" aria-labelledby="reactivateModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reactivateModalLabel">
+                            <i class="fa-solid fa-user-check text-info"></i> Phát hiện user đã bị deactive
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info mb-3">
+                            <i class="fa-solid fa-info-circle"></i> Email <strong>${deactivatedUser.email}</strong> đã tồn tại trong hệ thống nhưng user này đã bị deactive.
+                        </div>
+                        <p>Bạn có muốn kích hoạt lại user này không?</p>
+                        <div class="alert alert-warning">
+                            <strong>Thông tin user sẽ được kích hoạt:</strong><br>
+                            <strong>ID:</strong> ${deactivatedUser.id}<br>
+                            <strong>Họ tên:</strong> ${deactivatedUser.fullName}<br>
+                            <strong>Email:</strong> ${deactivatedUser.email}
+                        </div>
+                        <p class="text-info"><i class="fa-solid fa-info-circle"></i> Thông tin user sẽ được giữ nguyên như ban đầu.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <form method="post" action="${pageContext.request.contextPath}/admin/users/form" style="display: inline;">
+                            <input type="hidden" name="email" value="${deactivatedUser.email}" />
+                            <input type="hidden" name="reactivate" value="true" />
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa-solid fa-user-check"></i> Kích hoạt lại
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </c:if>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             // Hiển thị modal lỗi nếu có
@@ -160,9 +201,21 @@
                     errorModal.show();
                 }
                 
+                // Hiển thị modal kích hoạt lại user nếu có
+                var reactivateModalElement = document.getElementById('reactivateModal');
+                if (reactivateModalElement) {
+                    var reactivateModal = new bootstrap.Modal(reactivateModalElement);
+                    reactivateModal.show();
+                }
+                
                 // Xử lý sự kiện submit form
                 var userForm = document.getElementById('userForm');
                 userForm.addEventListener('submit', function(e) {
+                    // Nếu đang hiển thị modal kích hoạt lại, không submit form
+                    var reactivateModalElement = document.getElementById('reactivateModal');
+                    if (reactivateModalElement && reactivateModalElement.classList.contains('show')) {
+                        return;
+                    }
                     e.preventDefault();
                     showConfirmModal();
                 });

@@ -7,6 +7,7 @@
     List<User> list = (List<User>) request.getAttribute("users");
     List<Department> depts = (List<Department>) request.getAttribute("depts");
     Map<Integer, Set<String>> rolesOfUserMap = (Map<Integer, Set<String>>) request.getAttribute("rolesOfUserMap");
+    boolean showInactive = (boolean) request.getAttribute("showInactive");
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -26,32 +27,27 @@
             margin-top: 1.5rem;
         }
         .table {
-            border-collapse: separate;
+            border-collapse: collapse;
             border-spacing: 0;
             width: 100%;
         }
-        .table thead {
-            background: #6C7AE0;
-            color: #fff;
+        .table th, .table td {
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            vertical-align: middle;
         }
         .table thead th {
             background: #6C7AE0 !important;
             color: #fff !important;
             padding: 1rem;
             font-weight: 500;
-            text-align: left;
-        }
-        .table thead th:first-child { border-top-left-radius: 8px; }
-        .table thead th:last-child { border-top-right-radius: 8px; }
-
-        .table tbody tr {
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .table tbody tr:last-child {
-            border-bottom: none;
+            text-align: center;
+            vertical-align: middle;
         }
         .table tbody td {
             padding: 1rem;
+            text-align: center;
+            vertical-align: middle;
         }
         .table.table-hover tbody tr:hover {
             background: #f0f2ff !important;
@@ -63,38 +59,26 @@
         .action-btn { margin-right: 0.5rem; }
         .back-link { color: #4285F4; text-decoration: none; margin-top: 1.5rem; display: inline-block;}
         .back-link:hover { text-decoration: none; }
-        .dashboard-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            border: 1.5px solid #6C7AE0;
-            border-radius: 8px;
-            padding: 0.4rem 1.1rem 0.4rem 0.9rem;
-            background: #fff;
-            color: #6C7AE0;
-            font-weight: 500;
-            font-size: 1rem;
-            text-decoration: none;
-            margin-bottom: 1.5rem;
-            margin-top: 1.2rem;
-            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 8px rgba(108,122,224,0.04);
-        }
-        .dashboard-link:hover {
-            background: #6C7AE0;
-            color: #fff;
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
 <div class="container">
-    <a href="${pageContext.request.contextPath}/app/dashboard" class="dashboard-link">
-        <i class="fa-solid fa-house"></i> Dashboard
-    </a>
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0"><i class="fa-solid fa-users"></i> Danh sách người dùng</h2>
         <a href="${pageContext.request.contextPath}/admin/users/form" class="btn btn-add"><i class="fa-solid fa-user-plus"></i> Thêm user</a>
+        <div>
+            <c:choose>
+                <c:when test="${showInactive}">
+                    <a href="${pageContext.request.contextPath}/admin/users" class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-eye-slash"></i> Ẩn user deactive
+                    </a>
+                </c:when>
+                <c:otherwise>
+                    <a href="${pageContext.request.contextPath}/admin/users?showInactive=true" class="btn btn-outline-warning">
+                        <i class="fa-solid fa-eye"></i> Hiện user deactive
+                    </a>
+                </c:otherwise>
+            </c:choose>
+        </div>
     </div>
     
     <!-- Toast thông báo thành công ở góc trên bên phải -->
@@ -116,7 +100,7 @@
         <thead>
             <tr>
                 <th>STT</th>
-                <th>ID</th><th>Tên</th><th>Email</th><th>Phòng</th><th>Action</th>
+                <th>ID</th><th>Tên</th><th>Email</th><th>Phòng</th><th>Active</th><th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -139,15 +123,35 @@
                     </c:choose>
                 </td>
                 <td>
+                    <c:choose>
+                        <c:when test="${u.active}">
+                            <span class="badge bg-success">Active</span>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="badge bg-danger">Deactive</span>
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+                <td>
                     <a href="${pageContext.request.contextPath}/admin/users/form?id=${u.id}" class="btn btn-sm btn-primary action-btn"><i class="fa-solid fa-pen-to-square"></i> Sửa</a>
-                    <c:if test="${u.active}">
-                        <button type="button" class="btn btn-sm btn-danger action-btn delete-btn" 
-                                data-user-id="${u.id}" 
-                                data-user-name="${u.fullName}" 
-                                data-user-email="${u.email}">
-                            <i class="fa-solid fa-trash"></i> Xoá
-                        </button>
-                    </c:if>
+                    <c:choose>
+                        <c:when test="${u.active}">
+                            <button type="button" class="btn btn-sm btn-danger action-btn delete-btn" 
+                                    data-user-id="${u.id}" 
+                                    data-user-name="${u.fullName}" 
+                                    data-user-email="${u.email}">
+                                <i class="fa-solid fa-trash"></i> Xoá
+                            </button>
+                        </c:when>
+                        <c:otherwise>
+                            <button type="button" class="btn btn-sm btn-success action-btn reactivate-btn" 
+                                    data-user-id="${u.id}" 
+                                    data-user-name="${u.fullName}" 
+                                    data-user-email="${u.email}">
+                                <i class="fa-solid fa-user-check"></i> Kích hoạt
+                            </button>
+                        </c:otherwise>
+                    </c:choose>
                 </td>
             </tr>
             <c:set var="stt" value="${stt + 1}" />
@@ -168,19 +172,51 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Bạn có chắc chắn muốn xóa user này?</p>
+                <p>Bạn có chắc chắn muốn xóa mềm user này?</p>
                 <div class="alert alert-info">
                     <strong>ID:</strong> <span id="deleteUserId"></span><br>
                     <strong>Tên:</strong> <span id="deleteUserName"></span><br>
                     <strong>Email:</strong> <span id="deleteUserEmail"></span>
                 </div>
-                <p class="text-danger"><i class="fa-solid fa-exclamation-circle"></i> Hành động này không thể hoàn tác!</p>
+                <p class="text-warning"><i class="fa-solid fa-info-circle"></i> User sẽ bị deactive và có thể kích hoạt lại sau!</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                 <a href="#" id="confirmDeleteBtn" class="btn btn-danger">
                     <i class="fa-solid fa-trash"></i> Xác nhận xóa
                 </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận kích hoạt lại user -->
+<div class="modal fade" id="reactivateModal" tabindex="-1" aria-labelledby="reactivateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reactivateModalLabel">
+                    <i class="fa-solid fa-user-check text-success"></i> Xác nhận kích hoạt
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn kích hoạt lại user này?</p>
+                <div class="alert alert-info">
+                    <strong>ID:</strong> <span id="reactivateUserId"></span><br>
+                    <strong>Tên:</strong> <span id="reactivateUserName"></span><br>
+                    <strong>Email:</strong> <span id="reactivateUserEmail"></span>
+                </div>
+                <p class="text-success"><i class="fa-solid fa-check-circle"></i> User sẽ được kích hoạt lại và có thể đăng nhập!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form method="post" action="${pageContext.request.contextPath}/admin/users/delete" style="display: inline;">
+                    <input type="hidden" name="id" id="reactivateUserIdInput" />
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa-solid fa-user-check"></i> Xác nhận kích hoạt
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -208,6 +244,18 @@
                 showDeleteModal(userId, userName, userEmail);
             });
         });
+        
+        // Xử lý sự kiện click cho các nút kích hoạt
+        var reactivateButtons = document.querySelectorAll('.reactivate-btn');
+        reactivateButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                var userId = this.getAttribute('data-user-id');
+                var userName = this.getAttribute('data-user-name');
+                var userEmail = this.getAttribute('data-user-email');
+                
+                showReactivateModal(userId, userName, userEmail);
+            });
+        });
     });
     
     function showDeleteModal(userId, userName, userEmail) {
@@ -222,6 +270,20 @@
         // Hiển thị modal
         var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
         deleteModal.show();
+    }
+    
+    function showReactivateModal(userId, userName, userEmail) {
+        // Cập nhật thông tin user trong modal
+        document.getElementById('reactivateUserId').textContent = userId;
+        document.getElementById('reactivateUserName').textContent = userName;
+        document.getElementById('reactivateUserEmail').textContent = userEmail;
+        
+        // Cập nhật input hidden
+        document.getElementById('reactivateUserIdInput').value = userId;
+        
+        // Hiển thị modal
+        var reactivateModal = new bootstrap.Modal(document.getElementById('reactivateModal'));
+        reactivateModal.show();
     }
     
     function showSuccessToast(message) {

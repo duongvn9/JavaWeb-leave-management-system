@@ -58,7 +58,7 @@
             }
             .dashboard-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
                 gap: 1.5rem;
                 margin-bottom: 1.5rem;
             }
@@ -75,6 +75,8 @@
                 box-shadow: 0 2px 12px rgba(0,0,0,0.06);
                 text-decoration: none !important;
                 transition: transform 0.15s, box-shadow 0.15s;
+                height: 140px;
+                min-height: 140px;
             }
             .dashboard-card-item:hover {
                 transform: translateY(-4px) scale(1.03);
@@ -88,11 +90,49 @@
             .card-pink { background: linear-gradient(120deg, #ff6f91 60%, #fbc2eb 100%); }
             .card-grey { background: linear-gradient(120deg, #607d8b 60%, #b0bec5 100%); }
             .dashboard-card-item i { font-size: 1.7rem; margin-bottom: 0.7rem; }
-            .dashboard-card-item span { font-size: 1.08rem; font-weight: 500; }
+            .dashboard-card-item span { 
+                font-size: 1.08rem; 
+                font-weight: 500; 
+                text-align: center;
+                line-height: 1.3;
+                word-wrap: break-word;
+                max-width: 100%;
+            }
             .blur {
                 filter: blur(4px);
                 pointer-events: none;
                 user-select: none;
+            }
+            
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .dashboard-grid {
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 1rem;
+                }
+                .dashboard-card-item {
+                    height: 120px;
+                    min-height: 120px;
+                    padding: 1rem 0.8rem;
+                }
+                .dashboard-card-item i {
+                    font-size: 1.5rem;
+                    margin-bottom: 0.5rem;
+                }
+                .dashboard-card-item span {
+                    font-size: 1rem;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                .dashboard-grid {
+                    grid-template-columns: 1fr;
+                    gap: 1rem;
+                }
+                .dashboard-card-item {
+                    height: 100px;
+                    min-height: 100px;
+                }
             }
         </style>
     </head>
@@ -130,9 +170,10 @@
                     </a>
                 </c:if>
                 <c:if test="${roles != null && roles.contains('ADMIN')}">
-                    <a href="<%= request.getContextPath() %>/admin/users" class="dashboard-card-item card-pink">
-                        <i class="fa-solid fa-user-gear"></i>
-                        <span>Quản lý người dùng (thêm/sửa/xoá)</span>
+                    <!-- Card mới: Quản trị hệ thống -->
+                    <a href="<%= request.getContextPath() %>/admin/system" class="dashboard-card-item card-grey" id="adminSystemBtn">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Quản trị hệ thống</span>
                     </a>
                 </c:if>
             </div>
