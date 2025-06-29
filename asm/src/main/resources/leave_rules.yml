@@ -1,0 +1,67 @@
+auto_approve_enabled: true
+max_days: 3
+special_reasons:
+  - om nang
+  - nhap vien
+  - tai nan
+  - tai nan giao thong
+  - kham benh
+  - kham suc khoe
+  - kham thai
+  - phau thuat
+  - giai phau
+  - dieu tri
+  - nghi thai san
+  - sinh con
+  - vo sinh
+  - vo de
+  - chong sinh
+  - nhan con nuoi
+  - adopt
+  - dam tang
+  - dam ma
+  - gia dinh co tang
+  - le tang
+  - bo mat
+  - me mat
+  - ong mat
+  - ba mat
+  - ket hon
+  - dam cuoi
+  - dam hoi
+  - le dinh hon
+  - cham soc con om
+  - con om
+  - bo me om
+  - vo om
+  - chong om
+  - nguoi than bi benh nan y
+  - thi tot nghiep
+  - thi lai xe
+  - thi bang lai
+  - bao ve luan van
+  - thi cao hoc
+  - nghia vu quan su
+  - giao nghia vu
+  - hau toa
+  - hau toan
+  - hau toa an
+  - lam chung toa an
+  - lam giay to phap ly
+  - chay nha
+  - ngap nha
+  - vo ong nuoc
+  - mat dien keo dai
+  - sap nha
+  - sap tran
+  - dot bien
+  - hien mau
+  - tu thien
+  - ngay hoi hien mau
+  - tinh nguyen
+  - le phat dan
+  - le giang sinh
+  - le ramadan
+  - le vu lan
+  - le hanh huong
+  - le cau sieu 
