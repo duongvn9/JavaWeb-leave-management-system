@@ -11,8 +11,9 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * Xóa mềm user (active = 0). Chỉ dành cho ADMIN.
- * URL: GET /admin/users/delete?id=123
+ * Xóa mềm user (active = 0) và kích hoạt lại user. Chỉ dành cho ADMIN.
+ * URL: GET /admin/users/delete?id=123 (xóa mềm)
+ * URL: POST /admin/users/delete (kích hoạt lại)
  */
 @WebServlet("/admin/users/delete")
 public class AdminUserDeleteServlet extends HttpServlet {
@@ -22,11 +23,26 @@ public class AdminUserDeleteServlet extends HttpServlet {
         String id = req.getParameter("id");
         if (id != null && id.matches("\\d+")) {
             int userId = Integer.parseInt(id);
-            dao.hardDelete(userId);
+            dao.softDelete(userId);
             
             // Thêm thông báo thành công vào session
             HttpSession session = req.getSession();
-            session.setAttribute("successMessage", "Đã xóa user thành công!");
+            session.setAttribute("successMessage", "Đã xóa mềm user thành công!");
+        }
+        resp.sendRedirect(req.getContextPath() + "/admin/users");
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String id = req.getParameter("id");
+        if (id != null && id.matches("\\d+")) {
+            int userId = Integer.parseInt(id);
+            // Kích hoạt lại user (chỉ thay đổi active=1, giữ nguyên thông tin khác)
+            dao.activateUser(userId);
+            
+            // Thêm thông báo thành công vào session
+            HttpSession session = req.getSession();
+            session.setAttribute("successMessage", "Đã kích hoạt lại user thành công!");
         }
         resp.sendRedirect(req.getContextPath() + "/admin/users");
     }

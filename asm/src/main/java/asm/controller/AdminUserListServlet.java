@@ -24,7 +24,20 @@ public class AdminUserListServlet extends HttpServlet {
             session.removeAttribute("successMessage"); // Xóa thông báo sau khi đã đọc
         }
         
-        List<User> users = dao.listAll();
+        // Kiểm tra filter hiển thị user deactive
+        String showInactive = req.getParameter("showInactive");
+        List<User> users;
+        
+        if ("true".equals(showInactive)) {
+            // Hiển thị tất cả user (cả active và inactive)
+            users = dao.listAllIncludeInactive();
+            req.setAttribute("showInactive", true);
+        } else {
+            // Chỉ hiển thị user active
+            users = dao.listAll();
+            req.setAttribute("showInactive", false);
+        }
+        
         req.setAttribute("users", users);
         req.setAttribute("depts", dao.listDepartments());
         // Map userId -> set role code

@@ -55,8 +55,16 @@ public class UserDao {
         return single("SELECT * FROM users WHERE id=? AND active=1", id);
     }
 
+    public User findByIdIncludeInactive(int id) {
+        return single("SELECT * FROM users WHERE id=?", id);
+    }
+
     public User findByEmail(String email) {
         return single("SELECT * FROM users WHERE email=? AND active=1", email);
+    }
+
+    public User findByEmailIncludeInactive(String email) {
+        return single("SELECT * FROM users WHERE email=?", email);
     }
 
     public User findByGoogleId(String g) {
@@ -85,6 +93,20 @@ public class UserDao {
 
     public List<User> listAll() {
         return listByDepartment(null);
+    }
+
+    public List<User> listAllIncludeInactive() {
+        List<User> out = new ArrayList<>();
+        String sql = "SELECT * FROM users ORDER BY active DESC, id ASC";
+        try (Connection c = open(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                out.add(map(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return out;
     }
 
     public List<Department> listDepartments() {
@@ -150,7 +172,23 @@ public class UserDao {
     }
 
     public void softDelete(int id) {
-        updateUser(id, "", null, false);
+        String sql = "UPDATE users SET active=0 WHERE id=?";
+        try (Connection c = open(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void activateUser(int id) {
+        String sql = "UPDATE users SET active=1 WHERE id=?";
+        try (Connection c = open(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /* ========== role util ========= */

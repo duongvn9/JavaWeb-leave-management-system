@@ -65,37 +65,80 @@ public class AdminUserFormServlet extends HttpServlet {
         String fullName = req.getParameter("full_name");
         Integer deptId  = req.getParameter("deptId").isBlank() ? null : Integer.valueOf(req.getParameter("deptId"));
         int roleId      = Integer.parseInt(req.getParameter("roleId"));
+        String reactivate = req.getParameter("reactivate"); // Tham số để kích hoạt lại user
 
         boolean isEdit = id != null && !id.isBlank();
 
-        // Kiểm tra trùng email
-        User existing = dao.findByEmail(email);
+        // Nếu có yêu cầu kích hoạt lại user đã bị deactive
+        if (reactivate != null && reactivate.equals("true")) {
+            User existing = dao.findByEmailIncludeInactive(email);
+            if (existing != null && !existing.isActive()) {
+                // Kích hoạt lại user cũ (giữ nguyên thông tin cũ)
+                dao.activateUser(existing.getId());
+                
+                // Thêm thông báo thành công vào session
+                HttpSession session = req.getSession();
+                session.setAttribute("successMessage", "Đã kích hoạt lại user thành công!");
+                resp.sendRedirect(req.getContextPath() + "/admin/users");
+                return;
+            }
+        }
+
+        // Kiểm tra trùng email (bao gồm cả user đã bị deactive)
+        User existing = dao.findByEmailIncludeInactive(email);
         if (existing != null) {
             // trường hợp new hoặc sửa sang email của user khác
             if (!isEdit || existing.getId() != Integer.parseInt(id)) {
-                req.setAttribute("error", "Email đã tồn tại, vui lòng chọn email khác!");
-                // Set lại các attribute cần thiết cho form và giữ lại dữ liệu đã nhập
-                req.setAttribute("edit", isEdit);
-                
-                // Tạo tempUser để giữ lại dữ liệu đã nhập
-                User tempUser = new User(isEdit ? Integer.parseInt(id) : 0, null, email, fullName, deptId);
-                req.setAttribute("user", tempUser);
-                req.setAttribute("selectedRoleId", roleId);
-                
-                // Nếu đang edit, cần rolesOfUser
-                if (isEdit) {
-                    Set<String> rolesOfUser = dao.getRoles(Integer.parseInt(id));
-                    req.setAttribute("rolesOfUser", rolesOfUser);
+                // Nếu user đã bị deactive, hỏi admin có muốn kích hoạt lại không
+                if (!existing.isActive()) {
+                    req.setAttribute("deactivatedUser", existing);
+                    req.setAttribute("reactivate", true);
+                    req.setAttribute("edit", isEdit);
+                    
+                    // Tạo tempUser để giữ lại dữ liệu đã nhập
+                    User tempUser = new User(isEdit ? Integer.parseInt(id) : 0, null, email, fullName, deptId);
+                    req.setAttribute("user", tempUser);
+                    req.setAttribute("selectedRoleId", roleId);
+                    
+                    // Nếu đang edit, cần rolesOfUser
+                    if (isEdit) {
+                        Set<String> rolesOfUser = dao.getRoles(Integer.parseInt(id));
+                        req.setAttribute("rolesOfUser", rolesOfUser);
+                    }
+                    
+                    // Luôn nạp dropdown
+                    List<Department> depts = dao.listDepartments();
+                    List<RoleOption> roles = dao.listRoles();
+                    req.setAttribute("depts", depts);
+                    req.setAttribute("roles", roles);
+                    
+                    req.getRequestDispatcher("/WEB-INF/jsp/admin/userform.jsp").forward(req, resp);
+                    return;
+                } else {
+                    req.setAttribute("error", "Email đã tồn tại, vui lòng chọn email khác!");
+                    // Set lại các attribute cần thiết cho form và giữ lại dữ liệu đã nhập
+                    req.setAttribute("edit", isEdit);
+                    
+                    // Tạo tempUser để giữ lại dữ liệu đã nhập
+                    User tempUser = new User(isEdit ? Integer.parseInt(id) : 0, null, email, fullName, deptId);
+                    req.setAttribute("user", tempUser);
+                    req.setAttribute("selectedRoleId", roleId);
+                    
+                    // Nếu đang edit, cần rolesOfUser
+                    if (isEdit) {
+                        Set<String> rolesOfUser = dao.getRoles(Integer.parseInt(id));
+                        req.setAttribute("rolesOfUser", rolesOfUser);
+                    }
+                    
+                    // Luôn nạp dropdown
+                    List<Department> depts = dao.listDepartments();
+                    List<RoleOption> roles = dao.listRoles();
+                    req.setAttribute("depts", depts);
+                    req.setAttribute("roles", roles);
+                    
+                    req.getRequestDispatcher("/WEB-INF/jsp/admin/userform.jsp").forward(req, resp);
+                    return;
                 }
-                
-                // Luôn nạp dropdown
-                List<Department> depts = dao.listDepartments();
-                List<RoleOption> roles = dao.listRoles();
-                req.setAttribute("depts", depts);
-                req.setAttribute("roles", roles);
-                
-                req.getRequestDispatcher("/WEB-INF/jsp/admin/userform.jsp").forward(req, resp);
-                return;
             }
         }
 

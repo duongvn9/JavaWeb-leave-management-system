@@ -31,10 +31,11 @@ public class DepartmentUserListServlet extends HttpServlet {
         }
 
         Integer deptId;
+        // Luôn nạp list phòng ban cho dropdown và hiển thị tên phòng ban
+        List<Department> depts = dao.listDepartments();
+        req.setAttribute("depts", depts);
+        
         if (roles.contains("ADMIN")) {
-            // nạp list phòng ban cho dropdown
-            List<Department> depts = dao.listDepartments();
-            req.setAttribute("depts", depts);
             String p = req.getParameter("deptId");
             deptId = (p == null || p.isBlank()) ? null : Integer.valueOf(p);
         } else {
