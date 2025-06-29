@@ -99,6 +99,10 @@
         </div>
         <div class="form-card">
             <h2><i class="fa-solid fa-file-circle-plus"></i> Tạo đơn nghỉ phép</h2>
+            <div class="mb-3">
+                <span class="fw-bold">Số ngày phép còn lại trong năm: </span>
+                <span class="text-primary">${remain}</span>
+            </div>
             <form method="post" action="${pageContext.request.contextPath}/app/leave/create" id="leaveForm">
                 <div class="mb-3">
                     <label class="form-label">Từ ngày:</label>

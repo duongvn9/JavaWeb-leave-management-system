@@ -32,8 +32,18 @@ public class LeaveReviewListServlet extends HttpServlet {
         if (!isAdmin) {
             deptId = userDao.findDeptIdByUserId(u.getId());
         }
-        // Luôn lấy tất cả đơn theo phòng ban hoặc toàn bộ, không lọc trạng thái ở backend
-        List<LeaveRequest> list = leaveRequestService.listByDepartment(deptId, isAdmin);
+        
+        String status = req.getParameter("status");
+        List<LeaveRequest> list;
+        
+        if (status != null && !status.isEmpty()) {
+            // Lọc theo trạng thái cụ thể
+            list = leaveRequestService.listByDepartmentAndStatus(deptId, isAdmin, status);
+        } else {
+            // Lấy tất cả đơn
+            list = leaveRequestService.listByDepartment(deptId, isAdmin);
+        }
+        
         req.setAttribute("requests", list);
         req.getRequestDispatcher("/WEB-INF/jsp/leave/reviewlist.jsp").forward(req, resp);
     }

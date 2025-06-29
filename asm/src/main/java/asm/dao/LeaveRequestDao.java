@@ -31,7 +31,7 @@ public class LeaveRequestDao {
     }
 
     public LeaveRequest findById(int id) {
-        String sql = "SELECT lr.*, u.full_name emp_name, u.dept_id FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE lr.id=?";
+        String sql = "SELECT lr.*, u.full_name emp_name, u.dept_id, lr.ai_decision FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE lr.id=?";
         try (Connection con = DBCP.getDataSource().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -46,7 +46,7 @@ public class LeaveRequestDao {
 
     public List<LeaveRequest> listByEmployee(int empId) {
         List<LeaveRequest> list = new ArrayList<>();
-        String sql = "SELECT lr.*, u.full_name emp_name, u.dept_id FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE lr.employee_id=? ORDER BY lr.created_at DESC";
+        String sql = "SELECT lr.*, u.full_name emp_name, u.dept_id, lr.ai_decision FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE lr.employee_id=? ORDER BY lr.created_at DESC";
         try (Connection con = DBCP.getDataSource().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, empId);
             ResultSet rs = ps.executeQuery();
@@ -62,8 +62,8 @@ public class LeaveRequestDao {
     public List<LeaveRequest> listByDepartment(Integer deptId, boolean isAdmin) {
         List<LeaveRequest> list = new ArrayList<>();
         String sql = isAdmin
-                ? "SELECT lr.*, u.full_name emp_name, u.dept_id FROM leave_requests lr JOIN users u ON lr.employee_id=u.id ORDER BY lr.created_at DESC"
-                : "SELECT lr.*, u.full_name emp_name, u.dept_id FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE u.dept_id=? ORDER BY lr.created_at DESC";
+                ? "SELECT lr.*, u.full_name emp_name, u.dept_id, lr.ai_decision FROM leave_requests lr JOIN users u ON lr.employee_id=u.id ORDER BY lr.created_at DESC"
+                : "SELECT lr.*, u.full_name emp_name, u.dept_id, lr.ai_decision FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE u.dept_id=? ORDER BY lr.created_at DESC";
         try (Connection con = DBCP.getDataSource().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             if (!isAdmin) {
                 ps.setInt(1, deptId);
@@ -125,7 +125,11 @@ public class LeaveRequestDao {
                 rs.getString("reason"),
                 rs.getString("status"),
                 rs.getBoolean("is_edited"),
-                rs.getTimestamp("created_at").toLocalDateTime());
+                rs.getTimestamp("created_at").toLocalDateTime(),
+                rs.getString("ai_decision"),
+                rs.getString("approved_by"),
+                rs.getString("approver_type")
+        );
     }
 
     public void approveByAI(int id, String note) {
@@ -152,7 +156,7 @@ public class LeaveRequestDao {
 
     public List<LeaveRequest> listByEmployeeAndStatus(int empId, String status) {
         List<LeaveRequest> list = new ArrayList<>();
-        String sql = "SELECT lr.*, u.full_name emp_name, u.dept_id FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE lr.employee_id=? AND lr.status=? ORDER BY lr.created_at DESC";
+        String sql = "SELECT lr.*, u.full_name emp_name, u.dept_id, lr.ai_decision FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE lr.employee_id=? AND lr.status=? ORDER BY lr.created_at DESC";
         try (Connection con = DBCP.getDataSource().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, empId);
             ps.setString(2, status);
@@ -164,5 +168,40 @@ public class LeaveRequestDao {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public List<LeaveRequest> listByDepartmentAndStatus(Integer deptId, boolean isAdmin, String status) {
+        List<LeaveRequest> list = new ArrayList<>();
+        String sql = isAdmin
+                ? "SELECT lr.*, u.full_name emp_name, u.dept_id, lr.ai_decision FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE lr.status=? ORDER BY lr.created_at DESC"
+                : "SELECT lr.*, u.full_name emp_name, u.dept_id, lr.ai_decision FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE u.dept_id=? AND lr.status=? ORDER BY lr.created_at DESC";
+        try (Connection con = DBCP.getDataSource().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            if (isAdmin) {
+                ps.setString(1, status);
+            } else {
+                ps.setInt(1, deptId);
+                ps.setString(2, status);
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(map(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public void updateStatusAndApprover(int id, String status, String approvedBy, String approverType) {
+        String sql = "UPDATE leave_requests SET status=?, approved_by=?, approver_type=?, updated_at=GETDATE() WHERE id=?";
+        try (Connection con = DBCP.getDataSource().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setString(2, approvedBy);
+            ps.setString(3, approverType);
+            ps.setInt(4, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -22,6 +22,12 @@ public class LeaveRequestCreateServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        User u = (User) req.getSession(false).getAttribute("user");
+        int remain = 0;
+        if (u != null) {
+            remain = service.getQuotaRemaining(u.getId(), java.time.LocalDate.now().getYear());
+        }
+        req.setAttribute("remain", remain);
         req.getRequestDispatcher("/WEB-INF/jsp/leave/create.jsp").forward(req, resp);
     }
 

@@ -18,10 +18,14 @@ public class LeaveRequest implements Serializable {
     private String status; // INPROGRESS / APPROVED / REJECTED / CANCELLED
     private boolean edited;
     private LocalDateTime createdAt;
+    private String aiDecision;
+    private String approvedBy;
+    private String approverType;
 
     public LeaveRequest(int id, int employeeId, String employeeName, Integer deptId,
                         LocalDate fromDate, LocalDate toDate, String reason,
-                        String status, boolean edited, LocalDateTime createdAt) {
+                        String status, boolean edited, LocalDateTime createdAt, String aiDecision,
+                        String approvedBy, String approverType) {
         this.id = id;
         this.employeeId = employeeId;
         this.employeeName = employeeName;
@@ -32,6 +36,9 @@ public class LeaveRequest implements Serializable {
         this.status = status;
         this.edited = edited;
         this.createdAt = createdAt;
+        this.aiDecision = aiDecision;
+        this.approvedBy = approvedBy;
+        this.approverType = approverType;
     }
 
     // Getters
@@ -45,4 +52,9 @@ public class LeaveRequest implements Serializable {
     public String getStatus() { return status; }
     public boolean isEdited() { return edited; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+    public String getAiDecision() { return aiDecision; }
+    public String getApprovedBy() { return approvedBy; }
+    public void setApprovedBy(String approvedBy) { this.approvedBy = approvedBy; }
+    public String getApproverType() { return approverType; }
+    public void setApproverType(String approverType) { this.approverType = approverType; }
 }

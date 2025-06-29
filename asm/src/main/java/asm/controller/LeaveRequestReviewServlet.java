@@ -72,6 +72,8 @@ public class LeaveRequestReviewServlet extends HttpServlet {
         @SuppressWarnings("unchecked")
         Set<String> roles = (Set<String>) req.getSession().getAttribute("roles");
         if (roles.contains("ADMIN")) return true;
+        // Không cho leader duyệt đơn của chính mình
+        if (roles.contains("LEADER") && approver.getId() == lr.getEmployeeId()) return false;
         // leader: phải cùng phòng ban
         return roles.contains("LEADER") && approver.getDeptId() != null && approver.getDeptId().equals(lr.getDeptId());
     }
