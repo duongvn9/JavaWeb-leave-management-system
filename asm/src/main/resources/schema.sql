@@ -76,22 +76,26 @@ CREATE TABLE leave_requests (
     from_date    DATE NOT NULL,
     to_date      DATE NOT NULL,
     reason       NVARCHAR(255),
-    status       VARCHAR(20) NOT NULL, -- INPROGRESS / APPROVED / REJECTED
+    status       VARCHAR(20) NOT NULL, -- INPROGRESS / APPROVED / REJECTED / CANCELLED
     is_edited    BIT DEFAULT 0,
     created_at   DATETIME DEFAULT GETDATE(),
     updated_at   DATETIME,
+    ai_decision  VARCHAR(10) NULL,
+    approved_by  NVARCHAR(255) NULL,
+    approver_type VARCHAR(20) NULL, -- AI / USER
     CONSTRAINT fk_lr_emp FOREIGN KEY (employee_id) REFERENCES users(id)
 );
 
 CREATE TABLE approvals (
     id           INT IDENTITY PRIMARY KEY,
     request_id   INT NOT NULL,
-    approver_id  INT NOT NULL,
+    approver_id  INT NULL, -- NULL khi AI tự động duyệt
     action       VARCHAR(20) NOT NULL, -- APPROVED / REJECTED
     note         NVARCHAR(255),
     action_time  DATETIME DEFAULT GETDATE(),
+    auto_by_ai   BIT DEFAULT 0, -- true: AI tự động, false: người dùng
     CONSTRAINT fk_appr_req FOREIGN KEY (request_id) REFERENCES leave_requests(id),
-    CONSTRAINT fk_appr_user FOREIGN KEY (approver_id) REFERENCES users(id)
+    CONSTRAINT fk_appr_user FOREIGN KEY (approver_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 /*------------------------------------------------------------
@@ -111,6 +115,11 @@ CREATE TABLE audit_logs (
     CONSTRAINT fk_audit_actor FOREIGN KEY (actor_id) REFERENCES users(id)
 );
 
+CREATE TABLE app_config (
+    [key] VARCHAR(100) PRIMARY KEY,
+    [value] VARCHAR(100)
+);
+
 /*------------------------------------------------------------
  5. Seed Data
 ------------------------------------------------------------*/
@@ -127,7 +136,11 @@ INSERT INTO roles(code, name) VALUES
  ('LEADER', N'Trưởng phòng'),
  ('EMPLOYEE', N'Nhân viên');
 
--- 5.3 Seed users  (sử dụng dept_code để tra id)
+-- 5.3 Seed app_config
+INSERT INTO app_config([key], [value]) VALUES
+ ('auto_approve_enabled', 'true');
+
+-- 5.4 Seed users  (sử dụng dept_code để tra id)
 DECLARE @deptAdmin INT, @deptIT INT, @deptSale INT;
 SELECT @deptAdmin = id FROM departments WHERE code='ADMIN';
 SELECT @deptIT    = id FROM departments WHERE code='IT';
@@ -143,7 +156,7 @@ VALUES
  ('ngocduongvu.working@gmail.com', N'Dương Lead Sale', @deptSale),
  ('stepup.6m1t@gmail.com',         N'Nhân viên Sale 2',@deptSale);
 
--- 5.4 Gán vai trò (ADMIN cho user[1], LEADER cho user[2] & [6], EMPLOYEE cho còn lại)
+-- 5.5 Gán vai trò (ADMIN cho user[1], LEADER cho user[2] & [6], EMPLOYEE cho còn lại)
 DECLARE @roleAdmin INT, @roleLeader INT, @roleEmp INT;
 SELECT @roleAdmin  = id FROM roles WHERE code='ADMIN';
 SELECT @roleLeader = id FROM roles WHERE code='LEADER';
