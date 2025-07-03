@@ -192,6 +192,15 @@
 </head>
 <body>
     <div id="particles-js"></div>
+    <div style="text-align:center;z-index:3;position:relative;top:7rem;">
+        <table style="margin: 0 auto; background: #fff3cd; border-radius: 8px; border: 1px solid #ffeeba; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:24px;">
+            <tr>
+                <td style="color:#856404; padding:16px 32px; font-size:1.2rem; font-weight:500; font-family: 'Fira Mono', monospace; text-align:center;">
+                    Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau hoặc liên hệ quản trị viên để được hỗ trợ.
+                </td>
+            </tr>
+        </table>
+    </div>
     <div class="terminal-window">
         <header>
             <div class="button green"></div>
@@ -204,8 +213,6 @@
             <span class="typed-cursor"></span>
         </section>
     </div>
-    
-    <a href="javascript:window.history.back();" class="back-button">Quay lại trang trước</a>
 
     <script>
         particlesJS("particles-js", {
