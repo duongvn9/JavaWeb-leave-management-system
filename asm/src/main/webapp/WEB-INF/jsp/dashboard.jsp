@@ -169,13 +169,6 @@
                         <span>Duyệt đơn nhân viên</span>
                     </a>
                 </c:if>
-                <c:if test="${roles != null && roles.contains('ADMIN')}">
-                    <!-- Card mới: Quản trị hệ thống -->
-                    <a href="<%= request.getContextPath() %>/admin/system" class="dashboard-card-item card-grey" id="adminSystemBtn">
-                        <i class="fa-solid fa-shield-halved"></i>
-                        <span>Quản trị hệ thống</span>
-                    </a>
-                </c:if>
             </div>
             <footer class="footer text-center" style="width:100%; position:fixed; left:0; bottom:0; background:rgba(255,255,255,0.95); padding: 1rem 0; box-shadow: 0 -2px 12px rgba(0,0,0,0.04); z-index:10;">
                 <div class="mb-2" style="font-size:1.05rem; color:#666;">About project: JavaWeb Leave Management System &nbsp;|&nbsp; <b>ver 1.4</b></div>
