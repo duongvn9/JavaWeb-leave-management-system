@@ -97,24 +97,17 @@
 </head>
 <body>
 <div class="container">
-    <a href="${pageContext.request.contextPath}/app/dashboard" class="dashboard-link">
-        <i class="fa-solid fa-house"></i> Dashboard
-    </a>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0"><i class="fa-solid fa-list"></i> Danh sách đơn nghỉ phép của tôi</h2>
-        <form method="get" action="${pageContext.request.contextPath}/app/leave/list" class="row g-2 align-items-center">
-            <div class="col-auto">
-                <label for="status" class="col-form-label"><i class="fa-solid fa-filter"></i> Trạng thái:</label>
-            </div>
-            <div class="col-auto">
-                <select name="status" id="status" class="form-select" onchange="this.form.submit()">
-                    <option value="" <c:if test="${empty param.status}">selected</c:if>>Tất cả</option>
-                    <option value="APPROVED" <c:if test="${param.status == 'APPROVED'}">selected</c:if>>Đã đồng ý</option>
-                    <option value="REJECTED" <c:if test="${param.status == 'REJECTED'}">selected</c:if>>Đã từ chối</option>
-                    <option value="INPROGRESS" <c:if test="${param.status == 'INPROGRESS'}">selected</c:if>>Chưa duyệt</option>
-                    <option value="CANCELLED" <c:if test="${param.status == 'CANCELLED'}">selected</c:if>>Đã hủy</option>
-                </select>
-            </div>
+    <div class="d-flex justify-content-end align-items-center mb-4" style="gap:1rem;">
+        <form method="get" class="d-flex align-items-center" style="gap:0.5rem; background:#e3f0ff; border:2px solid #4285F4; border-radius:8px; padding:0.5rem 1rem; box-shadow:0 2px 8px rgba(66,133,244,0.08);">
+            <label for="status" class="form-label mb-0" style="font-weight:600; color:#4285F4;"><i class="fa-solid fa-filter"></i> Trạng thái:</label>
+            <select name="status" id="status" class="form-select" style="min-width:120px; border:1.5px solid #4285F4; font-weight:600; color:#232946; background:#fff;">
+                <option value="" ${empty param.status ? 'selected' : ''}>Tất cả</option>
+                <option value="PENDING" ${param.status == 'PENDING' ? 'selected' : ''}>Chờ duyệt</option>
+                <option value="APPROVED" ${param.status == 'APPROVED' ? 'selected' : ''}>Đã duyệt</option>
+                <option value="REJECTED" ${param.status == 'REJECTED' ? 'selected' : ''}>Bị từ chối</option>
+                <option value="CANCELLED" ${param.status == 'CANCELLED' ? 'selected' : ''}>Đã hủy</option>
+            </select>
+            <button type="submit" class="btn btn-primary" style="font-weight:600; margin-left:0.5rem;"><i class="fa-solid fa-filter"></i> Lọc</button>
         </form>
     </div>
     <!-- Toast thông báo -->
@@ -156,70 +149,81 @@
                 <th class="col-edited">Đã sửa?</th>
                 <th>Ngày tạo</th>
                 <th>Người duyệt</th>
+                <th>Ghi chú người duyệt</th>
                 <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
-        <c:set var="stt" value="1" />
-        <c:forEach var="r" items="${requests}">
-            <tr>
-                <td>${stt}</td>
-                <td>${r.id}</td>
-                <td>${r.employeeName} (ID: ${r.employeeId})</td>
-                <td class="col-from">${r.fromDate}</td>
-                <td class="col-to">${r.toDate}</td>
-                <td>
-                    <div class="reason-cell" style="max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: middle;">
-                        <span class="reason-text">${r.reason}</span>
-                    </div>
-                    <c:if test="${fn:length(r.reason) >= 20}">
-                        <button type="button" class="btn btn-link btn-sm p-0 ms-1 reason-toggle">Xem thêm</button>
-                    </c:if>
-                </td>
-                <td>
-                    <c:choose>
-                        <c:when test="${r.status eq 'INPROGRESS'}">
-                            <span class="badge bg-primary">Chờ duyệt</span>
-                        </c:when>
-                        <c:when test="${r.status eq 'APPROVED'}">
-                            <span class="badge bg-success">Đã duyệt</span>
-                        </c:when>
-                        <c:when test="${r.status eq 'REJECTED'}">
-                            <span class="badge bg-danger">Bị từ chối</span>
-                        </c:when>
-                        <c:when test="${r.status eq 'CANCELLED'}">
-                            <span class="badge bg-warning text-dark">Đã hủy</span>
-                        </c:when>
-                        <c:otherwise>
-                            <span class="badge bg-secondary">${r.status}</span>
-                        </c:otherwise>
-                    </c:choose>
-                </td>
-                <td class="col-edited">
-                    <c:if test="${r.edited}">
-                        <i class="fa-solid fa-check text-success"></i>
-                    </c:if>
-                </td>
-                <td>${r.createdAt}</td>
-                <td>
-                    <c:choose>
-                        <c:when test="${r.approverType eq 'AI'}">Tự động</c:when>
-                        <c:when test="${r.approverType eq 'USER'}">${r.approvedBy}</c:when>
-                        <c:otherwise>—</c:otherwise>
-                    </c:choose>
-                </td>
-                <td>
-                    <c:if test="${r.status eq 'INPROGRESS'}">
-                        <a href="${pageContext.request.contextPath}/app/leave/edit?id=${r.id}" class="btn btn-sm btn-primary action-btn"><i class="fa-solid fa-pen-to-square"></i> Sửa</a>
-                        <button type="button" class="btn btn-sm btn-danger action-btn cancel-btn"
-                                data-request-id="${r.id}">
-                            <i class="fa-solid fa-ban"></i> Huỷ
-                        </button>
-                    </c:if>
-                </td>
-            </tr>
-            <c:set var="stt" value="${stt + 1}" />
-        </c:forEach>
+        <c:choose>
+            <c:when test="${empty requests}">
+                <tr>
+                    <td colspan="12" class="text-center text-muted">Không có kết quả phù hợp với bộ lọc.</td>
+                </tr>
+            </c:when>
+            <c:otherwise>
+                <c:set var="stt" value="1" />
+                <c:forEach var="r" items="${requests}">
+                    <tr>
+                        <td>${stt}</td>
+                        <td>${r.id}</td>
+                        <td>${r.employeeName} (ID: ${r.employeeId})</td>
+                        <td class="col-from">${r.fromDate}</td>
+                        <td class="col-to">${r.toDate}</td>
+                        <td>
+                            <div class="reason-cell" style="max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: middle;">
+                                <span class="reason-text">${r.reason}</span>
+                            </div>
+                            <c:if test="${fn:length(r.reason) >= 20}">
+                                <button type="button" class="btn btn-link btn-sm p-0 ms-1 reason-toggle">Xem thêm</button>
+                            </c:if>
+                        </td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${r.status eq 'INPROGRESS'}">
+                                    <span class="badge bg-primary">Chờ duyệt</span>
+                                </c:when>
+                                <c:when test="${r.status eq 'APPROVED'}">
+                                    <span class="badge bg-success">Đã duyệt</span>
+                                </c:when>
+                                <c:when test="${r.status eq 'REJECTED'}">
+                                    <span class="badge bg-danger">Bị từ chối</span>
+                                </c:when>
+                                <c:when test="${r.status eq 'CANCELLED'}">
+                                    <span class="badge bg-warning text-dark">Đã hủy</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="badge bg-secondary">${r.status}</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td class="col-edited">
+                            <c:if test="${r.edited}">
+                                <i class="fa-solid fa-check text-success"></i>
+                            </c:if>
+                        </td>
+                        <td>${r.createdAt}</td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${r.approverType eq 'AI'}">Tự động</c:when>
+                                <c:when test="${r.approverType eq 'USER'}">${r.approvedBy}</c:when>
+                                <c:otherwise>—</c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td>${r.approverNote}</td>
+                        <td>
+                            <c:if test="${r.status eq 'INPROGRESS'}">
+                                <a href="${pageContext.request.contextPath}/app/leave/edit?id=${r.id}" class="btn btn-sm btn-primary action-btn"><i class="fa-solid fa-pen-to-square"></i> Sửa</a>
+                                <button type="button" class="btn btn-sm btn-danger action-btn cancel-btn"
+                                        data-request-id="${r.id}">
+                                    <i class="fa-solid fa-ban"></i> Huỷ
+                                </button>
+                            </c:if>
+                        </td>
+                    </tr>
+                    <c:set var="stt" value="${stt + 1}" />
+                </c:forEach>
+            </c:otherwise>
+        </c:choose>
         </tbody>
     </table>
     </div>

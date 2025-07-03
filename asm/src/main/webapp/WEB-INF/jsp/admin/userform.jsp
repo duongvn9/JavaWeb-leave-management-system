@@ -18,7 +18,7 @@
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
-        <title><c:choose><c:when test="${edit}">Sửa</c:when><c:otherwise>Thêm</c:otherwise></c:choose> người dùng</title>
+        <title><c:choose><c:when test="${edit}">Sửa</c:when><c:otherwise>Thêm</c:otherwise></c:choose> nhân viên</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
@@ -51,7 +51,7 @@
     </head>
     <body>
         <div class="form-card">
-            <h2><i class="fa-solid fa-user-edit"></i> <c:choose><c:when test="${edit}">Sửa</c:when><c:otherwise>Thêm</c:otherwise></c:choose> người dùng</h2>
+            <h2><i class="fa-solid fa-user-edit"></i> <c:choose><c:when test="${edit}">Sửa</c:when><c:otherwise>Thêm</c:otherwise></c:choose> nhân viên</h2>
             <form id="userForm" method="post" action="${pageContext.request.contextPath}/admin/users/form">
                 <c:if test="${edit}">
                     <input type="hidden" name="id" value="${user.id}" />
@@ -96,7 +96,7 @@
             <a href="${pageContext.request.contextPath}/admin/users" class="back-link"><i class="fa-solid fa-arrow-left"></i> Danh sách</a>
         </div>
 
-        <!-- Modal xác nhận lưu user -->
+        <!-- Modal xác nhận lưu nhân viên -->
         <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -107,7 +107,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Bạn có chắc chắn muốn <c:choose><c:when test="${edit}">cập nhật</c:when><c:otherwise>thêm mới</c:otherwise></c:choose> user này?</p>
+                        <p>Bạn có chắc chắn muốn <c:choose><c:when test="${edit}">cập nhật</c:when><c:otherwise>thêm mới</c:otherwise></c:choose> nhân viên này?</p>
                         <div class="alert alert-info">
                             <c:if test="${edit}">
                                 <strong>ID:</strong> <span id="confirmUserId">${user.id}</span><br>
@@ -152,29 +152,29 @@
         </div>
         </c:if>
 
-        <!-- Modal thông báo kích hoạt lại user -->
+        <!-- Modal thông báo kích hoạt lại nhân viên -->
         <c:if test="${reactivate}">
         <div class="modal fade" id="reactivateModal" tabindex="-1" aria-labelledby="reactivateModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="reactivateModalLabel">
-                            <i class="fa-solid fa-user-check text-info"></i> Phát hiện user đã bị deactive
+                            <i class="fa-solid fa-user-check text-info"></i> Phát hiện nhân viên đã bị deactive
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-info mb-3">
-                            <i class="fa-solid fa-info-circle"></i> Email <strong>${deactivatedUser.email}</strong> đã tồn tại trong hệ thống nhưng user này đã bị deactive.
+                            <i class="fa-solid fa-info-circle"></i> Email <strong>${deactivatedUser.email}</strong> đã tồn tại trong hệ thống nhưng nhân viên này đã bị deactive.
                         </div>
-                        <p>Bạn có muốn kích hoạt lại user này không?</p>
+                        <p>Bạn có muốn kích hoạt lại nhân viên này không?</p>
                         <div class="alert alert-warning">
-                            <strong>Thông tin user sẽ được kích hoạt:</strong><br>
+                            <strong>Thông tin nhân viên sẽ được kích hoạt:</strong><br>
                             <strong>ID:</strong> ${deactivatedUser.id}<br>
                             <strong>Họ tên:</strong> ${deactivatedUser.fullName}<br>
                             <strong>Email:</strong> ${deactivatedUser.email}
                         </div>
-                        <p class="text-info"><i class="fa-solid fa-info-circle"></i> Thông tin user sẽ được giữ nguyên như ban đầu.</p>
+                        <p class="text-info"><i class="fa-solid fa-info-circle"></i> Thông tin nhân viên sẽ được giữ nguyên như ban đầu.</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -201,7 +201,7 @@
                     errorModal.show();
                 }
                 
-                // Hiển thị modal kích hoạt lại user nếu có
+                // Hiển thị modal kích hoạt lại nhân viên nếu có
                 var reactivateModalElement = document.getElementById('reactivateModal');
                 if (reactivateModalElement) {
                     var reactivateModal = new bootstrap.Modal(reactivateModalElement);

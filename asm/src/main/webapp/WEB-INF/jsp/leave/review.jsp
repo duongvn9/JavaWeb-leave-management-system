@@ -83,5 +83,43 @@
             <br>
             <a href="${pageContext.request.contextPath}/app/leave/reviewlist" class="back-link"><i class="fa-solid fa-arrow-left"></i> Danh sách đơn</a>
         </div>
+        <!-- Modal báo lỗi ghi chú -->
+        <div id="noteErrorModal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);align-items:center;justify-content:center;">
+            <div style="background:#fff;padding:2rem 2.5rem;border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,0.12);text-align:center;min-width:320px;">
+                <h5 style="margin-bottom:1.5rem;color:#dc3545;"><i class="fa-solid fa-triangle-exclamation"></i> Lỗi ghi chú</h5>
+                <div id="noteErrorMsg" style="margin-bottom:1.5rem;"></div>
+                <button id="closeNoteError" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Đóng</button>
+            </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const reviewForm = document.querySelector('form');
+                const noteModal = document.getElementById('noteErrorModal');
+                const noteMsgBox = document.getElementById('noteErrorMsg');
+                const closeNoteBtn = document.getElementById('closeNoteError');
+                const reviewCard = document.querySelector('.review-card');
+
+                function closeNoteModal() {
+                    noteModal.style.display = 'none';
+                    reviewCard.classList.remove('blur');
+                }
+
+                reviewForm.onsubmit = function (e) {
+                    const note = document.querySelector('textarea[name="note"]').value;
+                    if (note.length > 255) {
+                        noteMsgBox.textContent = 'Ghi chú không được vượt quá 255 ký tự!';
+                        noteModal.style.display = 'flex';
+                        reviewCard.classList.add('blur');
+                        e.preventDefault();
+                    }
+                };
+
+                closeNoteBtn.onclick = closeNoteModal;
+                noteModal.onclick = function (e) {
+                    if (e.target === this)
+                        closeNoteModal();
+                };
+            });
+        </script>
     </body>
 </html>

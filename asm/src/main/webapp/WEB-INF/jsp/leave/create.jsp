@@ -92,11 +92,6 @@
         </style>
     </head>
     <body>
-        <div style="max-width: 480px; margin: 40px auto 10px auto;">
-            <a href="${pageContext.request.contextPath}/app/dashboard" class="dashboard-link">
-                <i class="fa-solid fa-house"></i> Dashboard
-            </a>
-        </div>
         <div class="form-card">
             <h2><i class="fa-solid fa-file-circle-plus"></i> Tạo đơn nghỉ phép</h2>
             <div class="mb-3">
@@ -142,6 +137,7 @@
                     leaveForm.onsubmit = function (e) {
                         const from = document.querySelector('input[name="from_date"]').value;
                         const to = document.querySelector('input[name="to_date"]').value;
+                        const reason = document.querySelector('textarea[name="reason"]').value;
                         const today = new Date();
                         today.setHours(0, 0, 0, 0);
                         const fromDate = from ? new Date(from) : null;
@@ -151,6 +147,8 @@
                             msg = 'Ngày bắt đầu phải từ hôm nay trở đi!';
                         } else if (!toDate || toDate <= fromDate) {
                             msg = 'Ngày kết thúc phải sau ngày bắt đầu!';
+                        } else if (reason.length > 255) {
+                            msg = 'Lý do không được vượt quá 255 ký tự!';
                         }
                         if (msg) {
                             msgBox.textContent = msg;

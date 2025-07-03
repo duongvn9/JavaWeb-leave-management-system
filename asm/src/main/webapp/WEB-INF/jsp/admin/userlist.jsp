@@ -13,7 +13,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản lý User</title>
+    <title>Quản lý nhân viên</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -64,17 +64,16 @@
 <body>
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="${pageContext.request.contextPath}/admin/users/form" class="btn btn-add"><i class="fa-solid fa-user-plus"></i> Thêm user</a>
         <div>
             <c:choose>
                 <c:when test="${showInactive}">
                     <a href="${pageContext.request.contextPath}/admin/users" class="btn btn-outline-secondary">
-                        <i class="fa-solid fa-eye-slash"></i> Ẩn user deactive
+                        <i class="fa-solid fa-eye-slash"></i> Ẩn nhân viên deactive
                     </a>
                 </c:when>
                 <c:otherwise>
                     <a href="${pageContext.request.contextPath}/admin/users?showInactive=true" class="btn btn-outline-warning">
-                        <i class="fa-solid fa-eye"></i> Hiện user deactive
+                        <i class="fa-solid fa-eye"></i> Hiện nhân viên deactive
                     </a>
                 </c:otherwise>
             </c:choose>
@@ -133,7 +132,11 @@
                     </c:choose>
                 </td>
                 <td>
-                    <a href="${pageContext.request.contextPath}/admin/users/form?id=${u.id}" class="btn btn-sm btn-primary action-btn"><i class="fa-solid fa-pen-to-square"></i> Sửa</a>
+                    <c:choose>
+                        <c:when test="${u.active}">
+                            <a href="${pageContext.request.contextPath}/admin/users/form?id=${u.id}" class="btn btn-sm btn-primary action-btn"><i class="fa-solid fa-pen-to-square"></i> Sửa</a>
+                        </c:when>
+                    </c:choose>
                     <c:choose>
                         <c:when test="${u.active}">
                             <button type="button" class="btn btn-sm btn-danger action-btn delete-btn" 
@@ -161,7 +164,7 @@
     </div>
 </div>
 
-<!-- Modal xác nhận xóa user -->
+<!-- Modal xác nhận xóa nhân viên -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -172,13 +175,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Bạn có chắc chắn muốn xóa mềm user này?</p>
+                <p>Bạn có chắc chắn muốn xóa mềm nhân viên này?</p>
                 <div class="alert alert-info">
                     <strong>ID:</strong> <span id="deleteUserId"></span><br>
                     <strong>Tên:</strong> <span id="deleteUserName"></span><br>
                     <strong>Email:</strong> <span id="deleteUserEmail"></span>
                 </div>
-                <p class="text-warning"><i class="fa-solid fa-info-circle"></i> User sẽ bị deactive và có thể kích hoạt lại sau!</p>
+                <p class="text-warning"><i class="fa-solid fa-info-circle"></i> Nhân viên sẽ bị deactive và có thể kích hoạt lại sau!</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -190,7 +193,7 @@
     </div>
 </div>
 
-<!-- Modal xác nhận kích hoạt lại user -->
+<!-- Modal xác nhận kích hoạt lại nhân viên -->
 <div class="modal fade" id="reactivateModal" tabindex="-1" aria-labelledby="reactivateModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -201,13 +204,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Bạn có chắc chắn muốn kích hoạt lại user này?</p>
+                <p>Bạn có chắc chắn muốn kích hoạt lại nhân viên này?</p>
                 <div class="alert alert-info">
                     <strong>ID:</strong> <span id="reactivateUserId"></span><br>
                     <strong>Tên:</strong> <span id="reactivateUserName"></span><br>
                     <strong>Email:</strong> <span id="reactivateUserEmail"></span>
                 </div>
-                <p class="text-success"><i class="fa-solid fa-check-circle"></i> User sẽ được kích hoạt lại và có thể đăng nhập!</p>
+                <p class="text-success"><i class="fa-solid fa-check-circle"></i> Nhân viên sẽ được kích hoạt lại và có thể đăng nhập!</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -259,7 +262,7 @@
     });
     
     function showDeleteModal(userId, userName, userEmail) {
-        // Cập nhật thông tin user trong modal
+        // Cập nhật thông tin nhân viên trong modal
         document.getElementById('deleteUserId').textContent = userId;
         document.getElementById('deleteUserName').textContent = userName;
         document.getElementById('deleteUserEmail').textContent = userEmail;
@@ -273,7 +276,7 @@
     }
     
     function showReactivateModal(userId, userName, userEmail) {
-        // Cập nhật thông tin user trong modal
+        // Cập nhật thông tin nhân viên trong modal
         document.getElementById('reactivateUserId').textContent = userId;
         document.getElementById('reactivateUserName').textContent = userName;
         document.getElementById('reactivateUserEmail').textContent = userEmail;

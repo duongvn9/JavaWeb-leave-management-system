@@ -79,9 +79,6 @@
 </head>
 <body>
 <div class="container">
-    <a href="${pageContext.request.contextPath}/app/dashboard" class="dashboard-link">
-        <i class="fa-solid fa-house"></i> Dashboard
-    </a>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0"><i class="fa-solid fa-users"></i> Danh sách nhân viên</h2>
         <c:if test="${not empty depts}">
