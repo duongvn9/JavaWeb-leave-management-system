@@ -21,11 +21,12 @@ public class LeaveRequest implements Serializable {
     private String aiDecision;
     private String approvedBy;
     private String approverType;
+    private String approverNote;
 
     public LeaveRequest(int id, int employeeId, String employeeName, Integer deptId,
                         LocalDate fromDate, LocalDate toDate, String reason,
                         String status, boolean edited, LocalDateTime createdAt, String aiDecision,
-                        String approvedBy, String approverType) {
+                        String approvedBy, String approverType, String approverNote) {
         this.id = id;
         this.employeeId = employeeId;
         this.employeeName = employeeName;
@@ -39,6 +40,7 @@ public class LeaveRequest implements Serializable {
         this.aiDecision = aiDecision;
         this.approvedBy = approvedBy;
         this.approverType = approverType;
+        this.approverNote = approverNote;
     }
 
     // Getters
@@ -57,4 +59,6 @@ public class LeaveRequest implements Serializable {
     public void setApprovedBy(String approvedBy) { this.approvedBy = approvedBy; }
     public String getApproverType() { return approverType; }
     public void setApproverType(String approverType) { this.approverType = approverType; }
+    public String getApproverNote() { return approverNote; }
+    public void setApproverNote(String approverNote) { this.approverNote = approverNote; }
 }

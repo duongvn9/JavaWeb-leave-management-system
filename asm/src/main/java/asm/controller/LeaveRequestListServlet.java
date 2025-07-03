@@ -28,6 +28,7 @@ public class LeaveRequestListServlet extends HttpServlet {
             return;
         }
         String status = req.getParameter("status");
+        if ("PENDING".equals(status)) status = "INPROGRESS";
         List<LeaveRequest> list;
         if (status != null && !status.isEmpty()) {
             list = service.listByEmployeeAndStatus(u.getId(), status);

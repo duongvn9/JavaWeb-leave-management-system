@@ -34,6 +34,7 @@ public class LeaveReviewListServlet extends HttpServlet {
         }
         
         String status = req.getParameter("status");
+        if ("PENDING".equals(status)) status = "INPROGRESS";
         List<LeaveRequest> list;
         
         if (status != null && !status.isEmpty()) {

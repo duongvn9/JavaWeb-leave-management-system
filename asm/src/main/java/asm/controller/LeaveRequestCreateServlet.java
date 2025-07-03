@@ -38,11 +38,26 @@ public class LeaveRequestCreateServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/signin");
             return;
         }
-        LocalDate from = LocalDate.parse(req.getParameter("from_date"));
-        LocalDate to   = LocalDate.parse(req.getParameter("to_date"));
-        String reason  = req.getParameter("reason");
+        try {
+            LocalDate from = LocalDate.parse(req.getParameter("from_date"));
+            LocalDate to   = LocalDate.parse(req.getParameter("to_date"));
+            String reason  = req.getParameter("reason");
 
-        service.create(u.getId(), from, to, reason);
-        resp.sendRedirect(req.getContextPath() + "/app/leave/list");
+            int result = service.create(u.getId(), from, to, reason);
+            if (result == -1) {
+                req.getSession().setAttribute("errorMessage", "Tạo đơn nghỉ phép thất bại. Vui lòng thử lại!");
+            } else {
+                req.getSession().setAttribute("successMessage", "Tạo đơn nghỉ phép thành công!");
+            }
+            resp.sendRedirect(req.getContextPath() + "/app/leave/list");
+        } catch (Exception ex) {
+            req.setAttribute("errorMessage", "Dữ liệu không hợp lệ hoặc lỗi hệ thống. Vui lòng kiểm tra lại!");
+            int remain = 0;
+            if (u != null) {
+                remain = service.getQuotaRemaining(u.getId(), java.time.LocalDate.now().getYear());
+            }
+            req.setAttribute("remain", remain);
+            req.getRequestDispatcher("/WEB-INF/jsp/leave/create.jsp").forward(req, resp);
+        }
     }
 }

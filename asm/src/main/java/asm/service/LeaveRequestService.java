@@ -42,11 +42,11 @@ public class LeaveRequestService {
             if ("APPROVED".equals(aiDecision)) {
                 long days = ChronoUnit.DAYS.between(lr.getFromDate(), lr.getToDate()) + 1;
                 quotaDao.decreaseUsed(lr.getEmployeeId(), lr.getFromDate().getYear(), (int) days);
-                dao.updateStatusAndApprover(id, "APPROVED", null, "AI");
+                dao.updateStatusAndApprover(id, "APPROVED", null, "AI", null);
                 // Ghi log vào bảng approvals
                 approvalDao.insert(id, null, "APPROVED", "Tự động duyệt bởi AI", true);
             } else if ("REJECTED".equals(aiDecision)) {
-                dao.updateStatusAndApprover(id, "REJECTED", null, "AI");
+                dao.updateStatusAndApprover(id, "REJECTED", null, "AI", null);
                 // Ghi log vào bảng approvals
                 approvalDao.insert(id, null, "REJECTED", "Tự động từ chối bởi AI", true);
             }
@@ -82,9 +82,9 @@ public class LeaveRequestService {
         }
         if ("APPROVE".equalsIgnoreCase(action)) {
             quotaDao.decreaseUsed(lr.getEmployeeId(), lr.getFromDate().getYear(), (int) days);
-            dao.updateStatusAndApprover(reqId, "APPROVED", approverName, "USER");
+            dao.updateStatusAndApprover(reqId, "APPROVED", approverName, "USER", note);
         } else {
-            dao.updateStatusAndApprover(reqId, "REJECTED", approverName, "USER");
+            dao.updateStatusAndApprover(reqId, "REJECTED", approverName, "USER", note);
         }
         approvalDao.insert(reqId, approverId, action.toUpperCase(), note, false);
     }
