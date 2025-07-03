@@ -34,7 +34,7 @@ public class AdminUserFormServlet extends HttpServlet {
         if (edit) {
             User u = dao.findById(Integer.parseInt(id));
             if (u == null) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "User không tồn tại hoặc đã bị xóa.");
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Nhân viên không tồn tại hoặc đã bị xóa.");
                 return;
             }
             req.setAttribute("user", u);
@@ -78,7 +78,7 @@ public class AdminUserFormServlet extends HttpServlet {
                 
                 // Thêm thông báo thành công vào session
                 HttpSession session = req.getSession();
-                session.setAttribute("successMessage", "Đã kích hoạt lại user thành công!");
+                session.setAttribute("successMessage", "Đã kích hoạt lại nhân viên thành công!");
                 resp.sendRedirect(req.getContextPath() + "/admin/users");
                 return;
             }
@@ -156,9 +156,9 @@ public class AdminUserFormServlet extends HttpServlet {
         // Thêm thông báo thành công vào session
         HttpSession session = req.getSession();
         if (!isEdit) {
-            session.setAttribute("successMessage", "Đã thêm user thành công!");
+            session.setAttribute("successMessage", "Đã thêm nhân viên thành công!");
         } else {
-            session.setAttribute("successMessage", "Đã cập nhật user thành công!");
+            session.setAttribute("successMessage", "Đã cập nhật nhân viên thành công!");
         }
         
         resp.sendRedirect(req.getContextPath() + "/admin/users");

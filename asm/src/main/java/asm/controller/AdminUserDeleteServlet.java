@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * Xóa mềm user (active = 0) và kích hoạt lại user. Chỉ dành cho ADMIN.
+ * Xóa mềm nhân viên (active = 0) và kích hoạt lại nhân viên. Chỉ dành cho ADMIN.
  * URL: GET /admin/users/delete?id=123 (xóa mềm)
  * URL: POST /admin/users/delete (kích hoạt lại)
  */
@@ -27,7 +27,7 @@ public class AdminUserDeleteServlet extends HttpServlet {
             
             // Thêm thông báo thành công vào session
             HttpSession session = req.getSession();
-            session.setAttribute("successMessage", "Đã xóa mềm user thành công!");
+            session.setAttribute("successMessage", "Đã xóa mềm nhân viên thành công!");
         }
         resp.sendRedirect(req.getContextPath() + "/admin/users");
     }
@@ -42,7 +42,7 @@ public class AdminUserDeleteServlet extends HttpServlet {
             
             // Thêm thông báo thành công vào session
             HttpSession session = req.getSession();
-            session.setAttribute("successMessage", "Đã kích hoạt lại user thành công!");
+            session.setAttribute("successMessage", "Đã kích hoạt lại nhân viên thành công!");
         }
         resp.sendRedirect(req.getContextPath() + "/admin/users");
     }
