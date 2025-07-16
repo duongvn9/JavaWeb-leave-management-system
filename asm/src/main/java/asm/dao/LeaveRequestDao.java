@@ -206,4 +206,23 @@ public class LeaveRequestDao {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Lấy tất cả đơn nghỉ phép đã duyệt (APPROVED) giao với khoảng fromDate, toDate
+     */
+    public List<LeaveRequest> listApprovedInRange(LocalDate fromDate, LocalDate toDate) {
+        List<LeaveRequest> list = new ArrayList<>();
+        String sql = "SELECT lr.*, u.full_name emp_name, u.dept_id, lr.ai_decision, lr.approver_note FROM leave_requests lr JOIN users u ON lr.employee_id=u.id WHERE lr.status='APPROVED' AND lr.from_date <= ? AND lr.to_date >= ?";
+        try (Connection con = DBCP.getDataSource().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDate(1, Date.valueOf(toDate));
+            ps.setDate(2, Date.valueOf(fromDate));
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(map(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

@@ -174,6 +174,9 @@
         <a href="#" class="nav-link" id="menu-leave-create">
             <i class="fa-solid fa-plus-circle"></i> Tạo đơn nghỉ phép
         </a>
+        <a href="#" class="nav-link" id="menu-leave-agenda">
+            <i class="fa-solid fa-calendar-days"></i> Agenda nghỉ phép
+        </a>
         <a href="#" class="nav-link" id="menu-dept-users">
             <i class="fa-solid fa-users"></i> Nhân viên phòng ban
         </a>
@@ -210,6 +213,9 @@
         </div>
         <div id="tab-leave-create" class="tab-pane">
             <iframe src="${pageContext.request.contextPath}/app/leave/create"></iframe>
+        </div>
+        <div id="tab-leave-agenda" class="tab-pane">
+            <iframe src="${pageContext.request.contextPath}/leader/agenda-report" style="width:100%;height:80vh;border:none;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.04);"></iframe>
         </div>
         <div id="tab-dept-users" class="tab-pane">
             <iframe src="${pageContext.request.contextPath}/app/department/users"></iframe>
@@ -280,6 +286,7 @@
         'menu-leave-list': { tab: 'leave-list', title: 'Danh sách đơn của tôi' },
         'menu-leave-create': { tab: 'leave-create', title: 'Tạo đơn nghỉ phép' },
         'menu-dept-users': { tab: 'dept-users', title: 'Nhân viên phòng ban' },
+        'menu-leave-agenda': { tab: 'leave-agenda', title: 'Agenda nghỉ phép' },
         'menu-about': { tab: 'about', title: 'Giới thiệu' }
     };
     Object.keys(menuItems).forEach(menuId => {

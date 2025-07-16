@@ -167,6 +167,9 @@
         <a href="#" class="nav-link" id="menu-leave-list">
             <i class="fa-solid fa-list"></i> Danh sách đơn của tôi
         </a>
+        <a href="#" class="nav-link" id="menu-leave-agenda">
+            <i class="fa-solid fa-calendar-days"></i> Agenda nghỉ phép
+        </a>
     </nav>
     <div class="system-content" id="systemContent">
         <div class="header-bar">
@@ -194,6 +197,9 @@
         </div>
         <div id="tab-leave-list" class="tab-pane">
             <iframe src="${pageContext.request.contextPath}/app/leave/list"></iframe>
+        </div>
+        <div id="tab-leave-agenda" class="tab-pane">
+            <iframe src="${pageContext.request.contextPath}/employee/agenda-report" style="width:100%;height:80vh;border:none;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.04);"></iframe>
         </div>
     </div>
 </div>
@@ -247,7 +253,8 @@
     // Tab menu
     const menuItems = {
         'menu-leave-create': { tab: 'leave-create', title: 'Tạo đơn nghỉ phép' },
-        'menu-leave-list': { tab: 'leave-list', title: 'Danh sách đơn của tôi' }
+        'menu-leave-list': { tab: 'leave-list', title: 'Danh sách đơn của tôi' },
+        'menu-leave-agenda': { tab: 'leave-agenda', title: 'Agenda nghỉ phép' }
     };
     Object.keys(menuItems).forEach(menuId => {
         document.getElementById(menuId).onclick = function(e) {

@@ -377,13 +377,7 @@
                     </div>
                     
                     <div id="tab-reports" class="tab-pane">
-                        <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:60vh;">
-                            <div style="text-align:center;">
-                                <i class="fa-solid fa-chart-bar" style="font-size:4rem;color:#34a853;margin-bottom:1.5rem;"></i>
-                                <h2 style="font-size:2rem;font-weight:700;margin:1rem 0;color:#232946;">Báo cáo tổng quan</h2>
-                                <p style="font-size:1.1rem;color:#666;">Tính năng đang được phát triển...</p>
-                            </div>
-                        </div>
+                        <iframe src="${pageContext.request.contextPath}/admin/agenda-report" style="width:100%;height:80vh;border:none;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.04);"></iframe>
                     </div>
                     
                     <div id="tab-analytics" class="tab-pane">

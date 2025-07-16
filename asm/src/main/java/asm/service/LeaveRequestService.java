@@ -100,4 +100,8 @@ public class LeaveRequestService {
     public List<LeaveRequest> listByDepartmentAndStatus(Integer deptId, boolean isAdmin, String status) {
         return dao.listByDepartmentAndStatus(deptId, isAdmin, status);
     }
+
+    public List<LeaveRequest> listApprovedInRange(LocalDate from, LocalDate to) {
+        return dao.listApprovedInRange(from, to);
+    }
 }
