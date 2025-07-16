@@ -192,15 +192,7 @@
 </head>
 <body>
     <div id="particles-js"></div>
-    <div style="text-align:center;z-index:3;position:relative;top:7rem;">
-        <table style="margin: 0 auto; background: #fff3cd; border-radius: 8px; border: 1px solid #ffeeba; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:24px;">
-            <tr>
-                <td style="color:#856404; padding:16px 32px; font-size:1.2rem; font-weight:500; font-family: 'Fira Mono', monospace; text-align:center;">
-                    Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau hoặc liên hệ quản trị viên để được hỗ trợ.
-                </td>
-            </tr>
-        </table>
-    </div>
+    <!-- Đã xóa hộp vàng thông báo phía trên -->
     <div class="terminal-window">
         <header>
             <div class="button green"></div>
@@ -330,6 +322,12 @@
             var data = [
                 {
                     action: 'type',
+                    strings: ["Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau hoặc liên hệ quản trị viên để được hỗ trợ."],
+                    output: '<span class="yellow">Lỗi hệ thống nội bộ (500)</span><br><br>',
+                    postDelay: 1200
+                },
+                {
+                    action: 'type',
                     strings: ["Accessing server logs..."],
                     output: 'checking system status..<br><br>',
                     postDelay: 1000
@@ -372,10 +370,10 @@
                     // cleanup for next execution
                     prompt.removeData();
                     $('.typed-cursor').text('');
-                    prompt.typed({
+                    new Typed(prompt[0], {
                         strings: script.strings,
                         typeSpeed: 30,
-                        callback: function() {
+                        onComplete: function(self) {
                             var history = $('.history').html();
                             history = history ? [history] : [];
                             history.push('$ ' + prompt.text());
