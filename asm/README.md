@@ -1,85 +1,121 @@
-# JavaWeb Leave Management System
+# Hệ Thống Quản Lý Nghỉ Phép
 
-## Tổng quan
+## 1. Giới thiệu
 
-Đây là hệ thống quản lý nghỉ phép cho doanh nghiệp, xây dựng bằng Java Servlet/JSP, tuân thủ mô hình MVC, sử dụng Jakarta EE, JSTL, JDBC và Google OAuth. Hệ thống hỗ trợ phân quyền (RBAC) cho các vai trò: Admin, Leader, Employee.
-
-- **Tác giả:** duongvn9
-- **Phiên bản:** 1.4
-- **Github:** https://github.com/duongvn9/JavaWeb-leave-management-system
-
-## Cấu trúc dự án
-
-```
-asm/
-├── src/
-│   ├── main/
-│   │   ├── java/asm/
-│   │   │   ├── controller/   # Servlet xử lý request (MVC Controller)
-│   │   │   ├── dao/          # Data Access Object (truy vấn DB)
-│   │   │   ├── model/        # Entity/model (User, Department, LeaveRequest...)
-│   │   │   ├── service/      # Business logic (LeaveRequestService...)
-│   │   │   ├── util/         # Tiện ích, cấu hình
-│   │   │   ├── filter/       # RBAC Filter
-│   │   │   ├── integrations/ # Tích hợp ngoài (Google OAuth, Gemini...)
-│   │   ├── resources/        # Cấu hình, script.sql
-│   │   ├── webapp/
-│   │   │   ├── WEB-INF/jsp/  # Giao diện JSP (dashboard, leave, admin...)
-│   │   │   ├── WEB-INF/web.xml # Cấu hình web
-│   │   │   └── index.html
-│   └── test/                 # Unit test (nếu có)
-├── pom.xml                   # Maven build file
-```
-
-## Chức năng chính
-
-### 1. Đăng nhập
-- Đăng nhập bằng Google OAuth (chỉ user đã đăng ký mới vào được hệ thống).
-
-### 2. Dashboard
-- Giao diện tổng quan, hiển thị thông tin cá nhân, vai trò, phòng ban.
-
-### 3. Quản lý đơn nghỉ phép
-- Nhân viên tạo, sửa, huỷ đơn nghỉ phép.
-- Xem danh sách đơn nghỉ phép của mình, lọc theo trạng thái.
-
-### 4. Duyệt đơn nghỉ phép
-- Leader/Admin xem và duyệt/từ chối đơn nghỉ phép của nhân viên phòng ban hoặc toàn công ty.
-- Xem lịch sử, trạng thái đơn.
-
-### 5. Quản lý người dùng (Admin)
-- Thêm, sửa, xoá user.
-- Gán phòng ban, vai trò cho user.
-- Xem danh sách user toàn hệ thống.
-
-### 6. Quản lý nhân sự phòng ban (Leader/Admin)
-- Xem danh sách nhân viên theo phòng ban.
-- Lọc theo phòng ban (Admin).
-
-### 7. Phân quyền (RBAC)
-- 3 vai trò: ADMIN, LEADER, EMPLOYEE.
-- Chỉ Admin mới truy cập được chức năng quản trị.
-- Leader chỉ xem/duyệt đơn của phòng mình.
-
-### 8. Cơ sở dữ liệu
-- SQL Server, file `script.sql` cung cấp cấu trúc bảng và dữ liệu mẫu.
-- Các bảng chính: users, departments, roles, user_roles, leave_requests, approvals, annual_leave_quota.
-
-## Công nghệ sử dụng
-- Java Servlet/JSP (Jakarta EE 10)
-- JSTL 3.0
-- JDBC, HikariCP
-- Google OAuth 2.0
-- SQL Server
-- Bootstrap 5, FontAwesome (giao diện)
-
-## Hướng dẫn cài đặt
-1. Clone project về máy.
-2. Import vào IDE (IntelliJ/NetBeans/Eclipse) dạng Maven project.
-3. Cấu hình DB SQL Server, import file `script.sql`.
-4. Cập nhật thông tin Google OAuth trong file cấu hình.
-5. Build và deploy lên server (Tomcat/Payara...)
+Hệ thống Quản lý Nghỉ phép là một ứng dụng web giúp doanh nghiệp quản lý quy trình xin nghỉ phép của nhân viên, bao gồm tạo đơn, duyệt đơn, thống kê, phân quyền và cấu hình hệ thống. Hệ thống hỗ trợ nhiều vai trò người dùng, tích hợp đăng nhập Google, và đảm bảo bảo mật dữ liệu.
 
 ---
 
-> Mọi thắc mắc vui lòng liên hệ tác giả qua Github hoặc Facebook.
+## 2. Chức năng hệ thống
+
+### 2.1. Đăng nhập & Xác thực
+- Đăng nhập bằng tài khoản nội bộ hoặc Google OAuth.
+- Phân quyền truy cập theo vai trò: Nhân viên, Trưởng phòng, Quản trị viên.
+- Đăng xuất an toàn.
+
+### 2.2. Quản lý đơn nghỉ phép
+- Nhân viên tạo mới, chỉnh sửa, huỷ đơn nghỉ phép.
+- Xem danh sách các đơn nghỉ phép của bản thân.
+- Theo dõi trạng thái đơn: Đang chờ duyệt, Đã duyệt, Từ chối, Đã huỷ.
+
+### 2.3. Duyệt đơn nghỉ phép
+- Trưởng phòng xem và duyệt/từ chối các đơn nghỉ phép của nhân viên trong phòng ban.
+- Quản trị viên có thể xem và can thiệp vào toàn bộ đơn nghỉ phép.
+
+### 2.4. Quản lý người dùng
+- Quản trị viên thêm, sửa, xoá tài khoản người dùng.
+- Phân quyền và gán vai trò cho từng người dùng.
+- Xem danh sách người dùng theo phòng ban.
+
+### 2.5. Quản lý phòng ban
+- Xem danh sách nhân viên theo từng phòng ban.
+- Quản trị viên có thể cấu hình thông tin phòng ban.
+
+### 2.6. Cấu hình hệ thống
+- Quản trị viên cấu hình các thông số hệ thống: số ngày phép mặc định, quy tắc nghỉ phép, v.v.
+- Cập nhật các quy tắc nghỉ phép từ file cấu hình.
+
+### 2.7. Dashboard & Thống kê
+- Hiển thị tổng quan số lượng đơn nghỉ phép, trạng thái đơn, thống kê theo phòng ban, cá nhân.
+- Thống kê số ngày phép đã sử dụng, còn lại.
+
+### 2.8. Bảo mật & Phân quyền
+- Kiểm soát truy cập các chức năng theo vai trò.
+- Đảm bảo an toàn dữ liệu người dùng.
+
+---
+
+## 3. Các thành phần chính
+
+### 3.1. Controller (Servlet)
+- Xử lý request, điều hướng view, gọi service/dao.
+- Ví dụ: LeaveRequestCreateServlet, AdminUserListServlet, SigninServlet, ...
+
+### 3.2. Service
+- Xử lý nghiệp vụ, logic phức tạp.
+- Ví dụ: LeaveRequestService, UserService, LeaveAutoService.
+
+### 3.3. DAO (Data Access Object)
+- Truy xuất dữ liệu từ DB.
+- Ví dụ: LeaveRequestDao, UserDao, ApprovalDao, QuotaDao.
+
+### 3.4. Model
+- Định nghĩa các entity: User, Role, Department, LeaveRequest, ...
+
+### 3.5. View (JSP)
+- Giao diện người dùng, hiển thị dữ liệu, nhận input.
+- Được tổ chức theo module: admin/, leave/, department/, ...
+
+### 3.6. Filter
+- Lọc request, kiểm tra phân quyền (RbacFilter).
+
+### 3.7. Tích hợp ngoài
+- Google OAuth (GoogleOAuthRedirectServlet, GoogleOAuthCallbackServlet, OauthConfig.java).
+- AI/Quyết định tự động (nếu có): GeminiClient.java, Decision.java.
+
+---
+
+## 4. Quy trình hoạt động tiêu biểu
+
+```mermaid
+flowchart TD
+    A[Nhân viên đăng nhập] --> B[Tạo đơn nghỉ phép]
+    B --> C[Trưởng phòng duyệt đơn]
+    C --> D[Quản trị viên giám sát]
+    D --> E[Thống kê, báo cáo]
+    A --> F[Quản lý tài khoản]
+    D --> G[Cấu hình hệ thống]
+```
+
+---
+
+## 5. Công nghệ sử dụng
+- Java Servlet, JSP
+- JDBC (DBCP)
+- Google OAuth 2.0
+- YAML, XML
+- Maven
+
+---
+
+## 6. Hướng dẫn cài đặt & chạy
+
+1. Clone source code về máy:
+   ```bash
+   git clone <repo-url>
+   ```
+2. Cấu hình database trong `src/main/resources/script.sql` và các file cấu hình liên quan.
+3. Build project với Maven:
+   ```bash
+   mvn clean package
+   ```
+4. Triển khai file WAR lên server (Tomcat/Glassfish).
+5. Truy cập hệ thống qua trình duyệt.
+
+---
+
+## 7. Đóng góp & phát triển
+- Đóng góp qua pull request hoặc liên hệ quản trị viên dự án.
+- Vui lòng tuân thủ quy tắc code và chuẩn hóa commit.
+
+---
