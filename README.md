@@ -1,7 +1,7 @@
 # JavaWeb Leave Management System
 
 ## Giới thiệu
-Đây là hệ thống quản lý nghỉ phép cho doanh nghiệp, được xây dựng trên nền tảng Java Web. Hệ thống hỗ trợ quản lý nhân viên, phòng ban, phân quyền, đăng ký và duyệt nghỉ phép, cùng nhiều tính năng liên quan đến quản lý nhân sự.
+Đây là hệ thống quản lý nghỉ phép cho doanh nghiệp, được xây dựng trên nền tảng Java Web. Hệ thống hỗ trợ quản lý nhân viên, phòng ban, phân quyền, đăng ký và duyệt nghỉ phép, cùng nhiều tính năng liên quan đến quản lý nhân sự. Mình xây dựng project dựa trên ý tưởng bài tập của môn học ứng dụng Java Web nên các trường dữ liệu, các logic còn đơn giản
 
 ## Tính năng chính
 - Quản lý thông tin nhân viên
@@ -19,6 +19,7 @@
 - MySQL (hoặc hệ quản trị CSDL tương thích)
 - Jakarta EE
 - Google API (tích hợp OAuth)
+- Call API Google Gemini hỗ trợ duyệt đơn
 
 ## Cấu trúc thư mục
 - `src/main/java/asm/`: Mã nguồn chính
@@ -43,19 +44,17 @@
    mvn clean package
    ```
 6. Deploy file `asm-1.0.war` lên Tomcat
-7. Truy cập hệ thống qua trình duyệt: `http://localhost:8080/asm-1.0`
+7. Truy cập hệ thống qua trình duyệt
 
 ## Tài khoản mẫu
-- Admin: `admin/admin123`
-- Leader: `leader/leader123`
-- Employee: `employee/employee123`
+- Các bạn có thể cấu hình email mẫu của người quản lý trong DB và bắt đầu thực hiện việc thêm nhân viên bằng giao diện. Mình làm bài tập môn học nhỏ nên logic còn đơn giản.
 
 ## Đóng góp
 Vui lòng fork repository, tạo pull request và mô tả rõ thay đổi. Đảm bảo tuân thủ chuẩn mã nguồn và kiểm thử trước khi gửi.
 
 ## Liên hệ
 - Tác giả: duongvn9
-- Email: duongvn9@example.com
+- Email: ngocduongvu.working@gmail.com
 
 ## License
 MIT License
@@ -123,7 +122,7 @@ flowchart TD
 
 1. Clone source code về máy:
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/duongvn9/JavaWeb-leave-management-system.git
    ```
 2. Cấu hình database trong `src/main/resources/script.sql` và các file cấu hình liên quan.
 3. Build project với Maven:
