@@ -1,43 +1,64 @@
-# Hệ Thống Quản Lý Nghỉ Phép
+# JavaWeb Leave Management System
 
-## 1. Giới thiệu
+## Giới thiệu
+Đây là hệ thống quản lý nghỉ phép cho doanh nghiệp, được xây dựng trên nền tảng Java Web. Hệ thống hỗ trợ quản lý nhân viên, phòng ban, phân quyền, đăng ký và duyệt nghỉ phép, cùng nhiều tính năng liên quan đến quản lý nhân sự.
 
-Hệ thống Quản lý Nghỉ phép là một ứng dụng web giúp doanh nghiệp quản lý quy trình xin nghỉ phép của nhân viên, bao gồm tạo đơn, duyệt đơn, thống kê, phân quyền và cấu hình hệ thống. Hệ thống hỗ trợ nhiều vai trò người dùng, tích hợp đăng nhập Google, và đảm bảo bảo mật dữ liệu.
+## Tính năng chính
+- Quản lý thông tin nhân viên
+- Quản lý phòng ban
+- Đăng ký nghỉ phép, duyệt nghỉ phép
+- Phân quyền truy cập (Admin, Leader, Employee)
+- Quản lý lịch sử nghỉ phép
+- Báo cáo tổng hợp
 
----
+## Công nghệ sử dụng
+- Java Servlet/JSP
+- Maven
+- Tomcat
+- JDBC
+- MySQL (hoặc hệ quản trị CSDL tương thích)
+- Jakarta EE
+- Google API (tích hợp OAuth)
 
-## 2. Chức năng hệ thống
+## Cấu trúc thư mục
+- `src/main/java/asm/`: Mã nguồn chính
+  - `controller/`: Xử lý request và điều hướng
+  - `dao/`: Truy cập dữ liệu
+  - `model/`: Định nghĩa các entity
+  - `service/`: Xử lý nghiệp vụ
+  - `util/`: Tiện ích chung
+  - `filter/`: Lọc request (RBAC, xác thực)
+  - `integrations/`: Tích hợp bên ngoài
+- `src/main/resources/`: Cấu hình ứng dụng
+- `src/main/webapp/`: Giao diện web (JSP, hình ảnh, cấu hình web)
+- `test/`: Mã nguồn kiểm thử
 
-### 2.1. Đăng nhập & Xác thực
-- Đăng nhập bằng tài khoản nội bộ hoặc Google OAuth.
-- Phân quyền truy cập theo vai trò: Nhân viên, Trưởng phòng, Quản trị viên.
-- Đăng xuất an toàn.
+## Hướng dẫn cài đặt
+1. Cài đặt JDK 17 trở lên
+2. Cài đặt Apache Tomcat 10+
+3. Cài đặt MySQL và tạo database phù hợp
+4. Cấu hình thông tin kết nối trong `src/main/resources/db.properties`
+5. Build dự án bằng Maven:
+   ```
+   mvn clean package
+   ```
+6. Deploy file `asm-1.0.war` lên Tomcat
+7. Truy cập hệ thống qua trình duyệt: `http://localhost:8080/asm-1.0`
 
-### 2.2. Quản lý đơn nghỉ phép
-- Nhân viên tạo mới, chỉnh sửa, huỷ đơn nghỉ phép.
-- Xem danh sách các đơn nghỉ phép của bản thân.
-- Theo dõi trạng thái đơn: Đang chờ duyệt, Đã duyệt, Từ chối, Đã huỷ.
+## Tài khoản mẫu
+- Admin: `admin/admin123`
+- Leader: `leader/leader123`
+- Employee: `employee/employee123`
 
-### 2.3. Duyệt đơn nghỉ phép
-- Trưởng phòng xem và duyệt/từ chối các đơn nghỉ phép của nhân viên trong phòng ban.
-- Quản trị viên có thể xem và can thiệp vào toàn bộ đơn nghỉ phép.
+## Đóng góp
+Vui lòng fork repository, tạo pull request và mô tả rõ thay đổi. Đảm bảo tuân thủ chuẩn mã nguồn và kiểm thử trước khi gửi.
 
-### 2.4. Quản lý người dùng
-- Quản trị viên thêm, sửa, xoá tài khoản người dùng.
-- Phân quyền và gán vai trò cho từng người dùng.
-- Xem danh sách người dùng theo phòng ban.
+## Liên hệ
+- Tác giả: duongvn9
+- Email: duongvn9@example.com
 
-### 2.5. Quản lý phòng ban
-- Xem danh sách nhân viên theo từng phòng ban.
-- Quản trị viên có thể cấu hình thông tin phòng ban.
-
-### 2.6. Cấu hình hệ thống
-- Quản trị viên cấu hình các thông số hệ thống: số ngày phép mặc định, quy tắc nghỉ phép, v.v.
-- Cập nhật các quy tắc nghỉ phép từ file cấu hình.
-
-### 2.7. Dashboard & Thống kê
-- Hiển thị tổng quan số lượng đơn nghỉ phép, trạng thái đơn, thống kê theo phòng ban, cá nhân.
-- Thống kê số ngày phép đã sử dụng, còn lại.
+## License
+MIT License
 
 ### 2.8. Bảo mật & Phân quyền
 - Kiểm soát truy cập các chức năng theo vai trò.
